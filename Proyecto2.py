@@ -12,7 +12,7 @@ df_original = df.copy()
 df.columns = df.columns.str.lower().str.strip()
 
 total = len(df)
-print("Total datos iniciales sin modificación:", total)
+#print("Total datos iniciales sin modificación:", total)
 
 #Solo permitir los que tienen consentimiento
 df = df[df["estu_estadoinvestigacion"] == "PUBLICAR"]
@@ -69,15 +69,46 @@ df["nivel_global"] = pd.qcut(
 df["promedio_areas"] = df[cols_areas].mean(axis=1)
 
 # Reporte de impacto
-print("Tamaño final:",df.shape) 
-print("Encabezado DataFrame:",df.head())
-print("Registros iniciales:", df_original.shape[0])
-print("Tomas con datos faltantes:", df_original.isna().sum())
-print("Registros finales:", df.shape[0])
-print("Porcentaje eliminado:", 
-      round((1 - df.shape[0]/df_original.shape[0]) * 100, 2), "%")
-print("Duplicados:", df_original.duplicated().sum())
+#print("Tamaño final:",df.shape) 
+#print("Encabezado DataFrame:",df.head())
+#print("Registros iniciales:", df_original.shape[0])
+#print("Tomas con datos faltantes:", df_original.isna().sum())
+#print("Registros finales:", df.shape[0])
+#print("Porcentaje eliminado:", 
+      #round((1 - df.shape[0]/df_original.shape[0]) * 100, 2), "%")
+#print("Duplicados:", df_original.duplicated().sum())
 
 ###FIN DE LIMPIEZA DE DATOS###
 
+###MODELO DE REGRESIÓN LINEAL - MANUELA###
 
+#Crear una lista de variables para el modelo de Manuela 
+print(df.columns)
+variables_manuela = [
+    "cole_area_ubicacion",
+    "cole_bilingue",
+    "cole_calendario",
+    "cole_genero",
+    "cole_jornada",
+    "cole_naturaleza",
+    "fami_cuartoshogar",
+    "fami_educacionmadre",
+    "fami_educacionpadre",
+    "fami_estratovivienda",
+    "fami_personashogar",
+    "fami_tieneautomovil",
+    "fami_tienecomputador",
+    "fami_tieneinternet",
+    "fami_tienelavadora",
+    "punt_ingles",
+    "punt_matematicas",
+    "punt_sociales_ciudadanas",
+    "punt_c_naturales",
+    "punt_lectura_critica",
+    "punt_global"
+]
+
+#Crear un nuevo df con las variables para el modelo de Manuela 
+df_manuela = df[variables_manuela].copy()
+print(type(df_manuela))
+print(df_manuela.head())
