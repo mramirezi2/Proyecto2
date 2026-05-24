@@ -83,13 +83,10 @@ df["promedio_areas"] = df[cols_areas].mean(axis=1)
 ###MODELO DE REGRESIÓN LINEAL - MANUELA###
 
 #Crear una lista de variables para el modelo de Manuela 
-print(df.columns)
+#print(df.columns)
 variables_manuela = [
     "cole_area_ubicacion",
     "cole_bilingue",
-    "cole_calendario",
-    "cole_genero",
-    "cole_jornada",
     "cole_naturaleza",
     "fami_cuartoshogar",
     "fami_educacionmadre",
@@ -110,5 +107,121 @@ variables_manuela = [
 
 #Crear un nuevo df con las variables para el modelo de Manuela 
 df_manuela = df[variables_manuela].copy()
-print(type(df_manuela))
-print(df_manuela.head())
+#print(type(df_manuela))
+#print(df_manuela.head())
+
+#Añadir variable de percentil nacional 
+df_manuela["percentil_nacional"] = df_manuela["punt_global"].rank(pct=True) * 100
+#print(df_manuela[["punt_global", "percentil_nacional"]].head())
+
+#Cambiar el nombre de los headers 
+df_manuela.rename(columns={
+    "cole_area_ubicacion" : "zona",
+    "cole_bilingue" : "bilingue",
+    "cole_naturaleza" : "naturaleza",
+    "fami_cuartoshogar" : "cuartos",
+    "fami_educacionmadre" : "edu_ma",
+    "fami_educacionpadre" : "edu_pa",
+    "fami_estratovivienda" : "estrato",
+    "fami_personashogar" : "personas",
+    "fami_tieneautomovil" : "carro",
+    "fami_tienecomputador" : "pc",
+    "fami_tieneinternet" : "internet",
+    "fami_tienelavadora" : "lavadora",
+    "punt_ingles" : "ingles",
+    "punt_matematicas" : "matematicas",
+    "punt_sociales_ciudadanas" : "sociales",
+    "punt_c_naturales" : "naturales",
+    "punt_lectura_critica" : "lectura",
+    "punt_global" : "global"}, inplace=True)
+
+#Convertir las variables necesarias a binarias o números
+    #Revisar los valores que entran a cada variable y cambiarlo si es necesario
+#print(df_manuela["zona"].unique())#RURAL/URBANO
+df_manuela["zona"] = df_manuela["zona"].map({"RURAL": 0,"URBANO": 1}) 
+
+#print(df_manuela["bilingue"].unique())#N/S
+df_manuela["bilingue"] = df_manuela["bilingue"].map({"N": 0, "S": 1})
+
+#print(df_manuela["naturaleza"].unique())#OFICIAL/NO OFICIAL
+df_manuela["naturaleza"] = df_manuela["naturaleza"].map({"OFICIAL": 0, "NO OFICIAL": 1})
+
+#print(df_manuela["cuartos"].unique())#STR(1,2,3,4,5,6,7,8,9,10+,6+)
+#print(df_manuela["cuartos"].value_counts())
+#Como hay bajos valores para 6+, se agrupan con 6 para evitar outliers
+df_manuela["cuartos"] = df_manuela["cuartos"].map({"Uno": 1,
+                                                    "Dos": 2,
+                                                    "Tres": 3,
+                                                    "Cuatro": 4,
+                                                    "Cinco": 5,
+                                                    "Seis": 6,
+                                                    "Seis o mas": 6,
+                                                    "Siete": 6,
+                                                    "Ocho": 6,
+                                                    "Nueve": 6,
+                                                    "Diez o más": 6
+                                                })
+
+#print(df_manuela["edu_ma"].unique())#12 VALORES DISTINTOS
+df_manuela["edu_ma"] = df_manuela["edu_ma"].map({"No sabe": np.nan,
+                                                 "No aplica": np.nan,
+                                                 "Ninguno": 0,
+                                                 "Primaria incompleta": 1,
+                                                 "Primaria completa": 2,
+                                                 "Secundaria (Bachillerato) incompleta": 3,
+                                                 "Secundaria (Bachillerato) completa": 4,
+                                                 "Técnica o tecnológica incompleta": 5,
+                                                 "Técnica o tecnológica completa": 6,
+                                                 "Educación profesional incompleta": 7,
+                                                 "Educación profesional completa": 8,
+                                                 "Postgrado": 9,})
+
+#print(df_manuela["edu_pa"].unique())# 12 VALORES DISTINTOS
+df_manuela["edu_pa"] = df_manuela["edu_pa"].map({"No sabe": np.nan,
+                                                 "No aplica": np.nan,
+                                                 "Ninguno": 0,
+                                                 "Primaria incompleta": 1,
+                                                 "Primaria completa": 2,
+                                                 "Secundaria (Bachillerato) incompleta": 3,
+                                                 "Secundaria (Bachillerato) completa": 4,
+                                                 "Técnica o tecnológica incompleta": 5,
+                                                 "Técnica o tecnológica completa": 6,
+                                                 "Educación profesional incompleta": 7,
+                                                 "Educación profesional completa": 8,
+                                                 "Postgrado": 9,})
+
+#print(df_manuela["estrato"].unique())#1,2,3,4,5,6
+df_manuela["estrato"] = df_manuela["estrato"].fillna(0)#Los NaN no son aleatorios, por ende se conservan como 0 
+
+#print(df_manuela["personas"].unique())#1,2,3,4,5,6,7,8,9,10+ (tiene muchos valores intermedios)
+#print(df_manuela["personas"].value_counts())
+df_manuela["personas"] = df_manuela["personas"].map({"Una": 1,
+                                                    "Dos": 2,
+                                                    "Tres": 3,
+                                                    "Cuatro": 4,
+                                                    "Cinco": 5,
+                                                    "Seis": 6,
+                                                    "Siete": 7,
+                                                    "Ocho": 8,
+                                                    "Nueve": 9,
+                                                    "Diez": 10,
+                                                    "Once": 11,
+                                                    "1 a 2": 2,
+                                                    "3 a 4": 4,
+                                                    "5 a 6": 6,
+                                                    "7 a 8": 8,
+                                                    "9 o más": 9,
+                                                    "Doce o más": 12})
+
+#print(df_manuela["carro"].unique())#N/S
+df_manuela["carro"] = df_manuela["carro"].map({"N": 0, "S": 1})
+
+
+#print(df_manuela["pc"].unique())#N/S
+df_manuela["pc"] = df_manuela["pc"].map({"N": 0, "S": 1})
+
+#print(df_manuela["internet"].unique())#N/S
+df_manuela["internet"] = df_manuela["internet"].map({"N": 0, "S": 1})
+
+#print(df_manuela["lavadora"].unique())#N/S
+df_manuela["lavadora"] = df_manuela["lavadora"].map({"N": 0, "S": 1})
