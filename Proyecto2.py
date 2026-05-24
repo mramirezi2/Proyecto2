@@ -4,7 +4,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import seaborn as sns
+#import seaborn as sns
 
 #Cargar el dataset
 df = pd.read_csv("datos_cauca.csv")
@@ -153,8 +153,8 @@ df_manuela["cuartos"] = df_manuela["cuartos"].map({"Uno": 1,
                                                 })
 
 #print(df_manuela["edu_ma"].unique())#12 VALORES DISTINTOS
-df_manuela["edu_ma"] = df_manuela["edu_ma"].map({"No sabe": np.nan,
-                                                 "No aplica": np.nan,
+df_manuela["edu_ma"] = df_manuela["edu_ma"].map({"No sabe": 0,
+                                                 "No aplica": 0,
                                                  "Ninguno": 0,
                                                  "Primaria incompleta": 1,
                                                  "Primaria completa": 2,
@@ -167,8 +167,8 @@ df_manuela["edu_ma"] = df_manuela["edu_ma"].map({"No sabe": np.nan,
                                                  "Postgrado": 9,})
 
 #print(df_manuela["edu_pa"].unique())# 12 VALORES DISTINTOS
-df_manuela["edu_pa"] = df_manuela["edu_pa"].map({"No sabe": np.nan,
-                                                 "No aplica": np.nan,
+df_manuela["edu_pa"] = df_manuela["edu_pa"].map({"No sabe": 0,
+                                                 "No aplica": 0,
                                                  "Ninguno": 0,
                                                  "Primaria incompleta": 1,
                                                  "Primaria completa": 2,
@@ -234,6 +234,7 @@ from sklearn.preprocessing import StandardScaler
 
 #Crear df final para el modelo 
 df_mmanuela = df_manuela.drop(columns=["puntaje"])
+df_mmanuela = df_mmanuela.fillna(0)
 
 #Separar variables independientes y dependientes
 y_mmanu = df_mmanuela.pop("percentil_nacional")
@@ -246,7 +247,7 @@ X_train_full_manu, X_test_manu, y_train_full_manu, y_test_manu = train_test_spli
 X_train_manu, X_valid_manu, y_train_manu, y_valid_manu = train_test_split(
     X_train_full_manu, y_train_full_manu, test_size=0.2, random_state=42)
 
-#print(X_train.shape)
+#print(X_train_manu.shape)
 
 #Normalizar los datos de las variables independientes
 scaler_manu = StandardScaler()
@@ -256,7 +257,8 @@ X_test_manu_scaled = scaler_manu.transform(X_test_manu)
 
 #Crear modelo
 modelo_manuela = keras.models.Sequential([
-    keras.layers.Dense(64, activation="relu", input_shape=[X_train_manu_scaled.shape[1:]]),
+    keras.layers.Input(shape=(X_train_manu_scaled.shape[1],)),
+    keras.layers.Dense(64, activation="relu"),
     keras.layers.Dense(32, activation="relu"),
     keras.layers.Dense(1)
 ])
@@ -268,8 +270,25 @@ modelo_manuela.compile(
     metrics = ["mae"]
 )
 
+print(modelo_manuela.summary())
+
 #Entrenar el modelo
 hist_mmanu = modelo_manuela.fit(X_train_manu_scaled, y_train_manu, 
-                                epochs=100,
-                                validation_data=(X_valid_manu_scaled, y_valid_manu))    
-                    
+                                epochs=50,
+                                validation_data=(X_valid_manu_scaled, y_valid_manu)) 
+
+#Revisar el historial de entrenamiento
+print(hist_mmanu.history.keys())
+print(hist_mmanu.history["loss"][:5])
+print(hist_mmanu.history["val_loss"][:5])
+
+#Graficar historial de pérdida
+plt.figure(figsize=(8,5))
+plt.plot(hist_mmanu.history["loss"], label="Train loss")
+plt.plot(hist_mmanu.history["val_loss"], label="Validation loss")
+plt.xlabel("Épocas")
+plt.ylabel("Pérdida")
+plt.title("Historial de pérdida - Modelo base")
+plt.legend()
+plt.grid(True)
+plt.show()  
