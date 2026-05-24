@@ -214,14 +214,24 @@ df_manuela["personas"] = df_manuela["personas"].map({"Una": 1,
                                                     "Doce o más": 12})
 
 #print(df_manuela["carro"].unique())#N/S
-df_manuela["carro"] = df_manuela["carro"].map({"N": 0, "S": 1})
+df_manuela["carro"] = df_manuela["carro"].map({"No": 0, "Si": 1})
 
 
 #print(df_manuela["pc"].unique())#N/S
-df_manuela["pc"] = df_manuela["pc"].map({"N": 0, "S": 1})
+df_manuela["pc"] = df_manuela["pc"].map({"No": 0, "Si": 1})
 
 #print(df_manuela["internet"].unique())#N/S
-df_manuela["internet"] = df_manuela["internet"].map({"N": 0, "S": 1})
+df_manuela["internet"] = df_manuela["internet"].map({"No": 0, "Si": 1})
 
 #print(df_manuela["lavadora"].unique())#N/S
-df_manuela["lavadora"] = df_manuela["lavadora"].map({"N": 0, "S": 1})
+df_manuela["lavadora"] = df_manuela["lavadora"].map({"No": 0, "Si": 1})
+
+#Crear nuevas variables de análisis 
+df_manuela["hacinamiento"] = df_manuela["personas"] / df_manuela["cuartos"]
+df_manuela["edu_prom_padres"]= df_manuela[["edu_ma", "edu_pa"]].mean(axis=1)
+df_manuela["recursos_tecnologicos"] = df_manuela["internet"] + df_manuela["pc"]
+df_manuela["recursos_hogar"] = df_manuela["carro"] + df_manuela["lavadora"]
+
+#Revisar que el .map haya quedado bien 
+#print(df_manuela.isna().sum())
+
