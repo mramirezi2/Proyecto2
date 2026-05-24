@@ -97,11 +97,6 @@ variables_manuela = [
     "fami_tienecomputador",
     "fami_tieneinternet",
     "fami_tienelavadora",
-    "punt_ingles",
-    "punt_matematicas",
-    "punt_sociales_ciudadanas",
-    "punt_c_naturales",
-    "punt_lectura_critica",
     "punt_global"
 ]
 
@@ -128,17 +123,12 @@ df_manuela.rename(columns={
     "fami_tienecomputador" : "pc",
     "fami_tieneinternet" : "internet",
     "fami_tienelavadora" : "lavadora",
-    "punt_ingles" : "ingles",
-    "punt_matematicas" : "matematicas",
-    "punt_sociales_ciudadanas" : "sociales",
-    "punt_c_naturales" : "naturales",
-    "punt_lectura_critica" : "lectura",
-    "punt_global" : "global"}, inplace=True)
+    "punt_global" : "puntaje"}, inplace=True)
 
 #Convertir las variables necesarias a binarias o números
     #Revisar los valores que entran a cada variable y cambiarlo si es necesario
 #print(df_manuela["zona"].unique())#RURAL/URBANO
-df_manuela["zona"] = df_manuela["zona"].map({"RURAL": 0,"URBANO": 1}) 
+df_manuela["zona"] = df_manuela["zona"].map({"RURAL": 1,"URBANO": 0}) 
 
 #print(df_manuela["bilingue"].unique())#N/S
 df_manuela["bilingue"] = df_manuela["bilingue"].map({"N": 0, "S": 1})
@@ -234,4 +224,11 @@ df_manuela["recursos_hogar"] = df_manuela["carro"] + df_manuela["lavadora"]
 
 #Revisar que el .map haya quedado bien 
 #print(df_manuela.isna().sum())
+
+#Crear df final para el modelo 
+df_mmanuela = df_manuela.drop(columns=["puntaje"])
+
+#Separar variables independientes y dependientes
+y_mmanu = df_mmanuela.pop("percentil_nacional")
+x_mmanu = df_mmanuela 
 
