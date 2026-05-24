@@ -228,6 +228,7 @@ df_manuela["recursos_hogar"] = df_manuela["carro"] + df_manuela["lavadora"]
 #Preparar los datos para el modelo de regresión lineal 
 #Importar librerías para el modelo
 import tensorflow as tf
+from tensorflow import keras
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -253,4 +254,22 @@ X_train_manu_scaled = scaler_manu.fit_transform(X_train_manu)
 X_valid_manu_scaled = scaler_manu.transform(X_valid_manu)
 X_test_manu_scaled = scaler_manu.transform(X_test_manu)
 
+#Crear modelo
+modelo_manuela = keras.models.Sequential([
+    keras.layers.Dense(64, activation="relu", input_shape=[X_train_manu_scaled.shape[1:]]),
+    keras.layers.Dense(32, activation="relu"),
+    keras.layers.Dense(1)
+])
 
+#Compilar modelo 
+modelo_manuela.compile(
+    loss = "mse",
+    optimizer = "adam",
+    metrics = ["mae"]
+)
+
+#Entrenar el modelo
+hist_mmanu = modelo_manuela.fit(X_train_manu_scaled, y_train_manu, 
+                                epochs=100,
+                                validation_data=(X_valid_manu_scaled, y_valid_manu))    
+                    
