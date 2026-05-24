@@ -225,10 +225,32 @@ df_manuela["recursos_hogar"] = df_manuela["carro"] + df_manuela["lavadora"]
 #Revisar que el .map haya quedado bien 
 #print(df_manuela.isna().sum())
 
+#Preparar los datos para el modelo de regresión lineal 
+#Importar librerías para el modelo
+import tensorflow as tf
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
 #Crear df final para el modelo 
 df_mmanuela = df_manuela.drop(columns=["puntaje"])
 
 #Separar variables independientes y dependientes
 y_mmanu = df_mmanuela.pop("percentil_nacional")
 x_mmanu = df_mmanuela 
+
+#Dividir datos en entrenamiento, validación y prueba
+X_train_full_manu, X_test_manu, y_train_full_manu, y_test_manu = train_test_split(
+    df_mmanuela, y_mmanu, test_size=0.2, random_state=42)
+
+X_train_manu, X_valid_manu, y_train_manu, y_valid_manu = train_test_split(
+    X_train_full_manu, y_train_full_manu, test_size=0.2, random_state=42)
+
+#print(X_train.shape)
+
+#Normalizar los datos de las variables independientes
+scaler_manu = StandardScaler()
+X_train_manu_scaled = scaler_manu.fit_transform(X_train_manu)
+X_valid_manu_scaled = scaler_manu.transform(X_valid_manu)
+X_test_manu_scaled = scaler_manu.transform(X_test_manu)
+
 
