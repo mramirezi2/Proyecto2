@@ -301,7 +301,7 @@ early_stop = tf.keras.callbacks.EarlyStopping(
 # ENTRENAMIENTO
 
 resultados = {}
-mlflow.set_experiment("Saber11_Cauca_Brecha_Territorial")
+mlflow.set_experiment("/Saber11_Cauca_Brecha_Territorial")
  
 for nombre, build_fn in modelos_config.items():
     print(f"  Entrenando: {nombre}")
