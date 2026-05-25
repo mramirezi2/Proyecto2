@@ -206,7 +206,7 @@ tab_portada = html.Div(
 
 
 # ======================================================
-# Tabs genéricas para las preguntas
+# Tabs para las preguntas
 # ======================================================
 
 tab_pregunta_1 = html.Div(
@@ -216,7 +216,7 @@ tab_pregunta_1 = html.Div(
         "backgroundColor": COLOR_GRIS
     },
     children=[
-        html.H2("Pregunta 1", style={"color": COLOR_AZUL}),
+        html.H2("Desempeño institucional", style={"color": COLOR_AZUL}),
         html.Div(
             style=card_style,
             children=[
@@ -239,7 +239,7 @@ tab_pregunta_2 = html.Div(
         "backgroundColor": COLOR_GRIS
     },
     children=[
-        html.H2("Pregunta 2", style={"color": COLOR_AZUL}),
+        html.H2("Riesgo por brecha digital", style={"color": COLOR_AZUL}),
         html.Div(
             style=card_style,
             children=[
@@ -262,7 +262,7 @@ tab_pregunta_3 = html.Div(
         "backgroundColor": COLOR_GRIS
     },
     children=[
-        html.H2("Pregunta 3", style={"color": COLOR_AZUL}),
+        html.H2("Percentil esperado", style={"color": COLOR_AZUL}),
         html.Div(
             style=card_style,
             children=[
@@ -295,9 +295,9 @@ app.layout = html.Div(
             value="portada",
             children=[
                 dcc.Tab(label="Portada", value="portada"),
-                dcc.Tab(label="Pregunta 1", value="pregunta_1"),
-                dcc.Tab(label="Pregunta 2", value="pregunta_2"),
-                dcc.Tab(label="Pregunta 3", value="pregunta_3")
+                dcc.Tab(label="Desempeño institucional", value="pregunta_1"),
+                dcc.Tab(label="Riesgo por brecha digital", value="pregunta_2"),
+                dcc.Tab(label="Percentil esperado", value="pregunta_3")
             ],
             style={"fontFamily": "Arial"}
         ),
