@@ -178,7 +178,7 @@ for cls, w in class_weight_dict.items():
 print("RESUMEN PARA LA RED NEURONAL")
 print(f"  Input shape:     {X_train_scaled.shape[1]} neuronas de entrada")
 print(f"  Output shape:    4 clases (softmax)")
-print(f"  Función de loss: categorical_crossentropy (o sparse si y es int)")
+print(f"  Función de loss: categorical_crossentropy")
 print(f"  Métrica base:    accuracy + F1-macro (por clases balanceadas)")
  
 np.save("X_train.npy",  X_train_scaled)
@@ -193,3 +193,193 @@ pd.Series(X.columns).to_csv("feature_names.csv", index=False)
 print("\nPreprocesamiento completado")
  
 ### FIN PREPROCESAMIENTO ###
+
+### MODELAMIENTO ###
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3" 
+
+import tensorflow as tf
+from sklearn.metrics import classification_report, f1_score, accuracy_score, confusion_matrix
+from sklearn.utils.class_weight import compute_class_weight
+ 
+# CARGAR DATOS
+X_train = np.load("X_train.npy")
+X_val   = np.load("X_val.npy")
+X_test  = np.load("X_test.npy")
+y_train = np.load("y_train.npy")
+y_val   = np.load("y_val.npy")
+y_test  = np.load("y_test.npy")
+ 
+feature_names = pd.read_csv("feature_names.csv").iloc[:, 0].tolist()
+label_names   = ["Bajo", "Medio", "Alto", "Muy Alto"]
+n_features    = X_train.shape[1]
+n_classes     = 4
+ 
+print(f"Train: {X_train.shape} | Val: {X_val.shape} | Test: {X_test.shape}")
+ 
+y_train_cat = tf.keras.utils.to_categorical(y_train, num_classes=n_classes)
+y_val_cat   = tf.keras.utils.to_categorical(y_val,   num_classes=n_classes)
+y_test_cat  = tf.keras.utils.to_categorical(y_test,  num_classes=n_classes)
+ 
+print(f"\nEjemplo y_train codificado (primeras 3 filas):\n{y_train_cat[:3]}")
+ 
+cw = compute_class_weight("balanced", classes=np.unique(y_train), y=y_train)
+class_weight_dict = dict(enumerate(cw))
+ 
+# ARQUITECTURAS
+ 
+def modelo_A():
+    tf.random.set_seed(42)
+    tf.keras.backend.clear_session()
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(n_features,)),
+        tf.keras.layers.Dense(32, activation="relu"),
+        tf.keras.layers.Dense(n_classes, activation="softmax")
+    ], name="ModeloA_Simple")
+    model.compile(
+        loss="categorical_crossentropy",
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        metrics=["accuracy"]
+    )
+    return model
+ 
+def modelo_B():
+    tf.random.set_seed(42)
+    tf.keras.backend.clear_session()
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(n_features,)),
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(32, activation="relu"),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(n_classes, activation="softmax")
+    ], name="ModeloB_Dropout")
+    model.compile(
+        loss="categorical_crossentropy",
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        metrics=["accuracy"]
+    )
+    return model
+ 
+def modelo_C():
+    tf.random.set_seed(42)
+    tf.keras.backend.clear_session()
+    reg = tf.keras.regularizers.l2(0.001)
+    model = tf.keras.Sequential([
+        tf.keras.layers.Input(shape=(n_features,)),
+        tf.keras.layers.Dense(64, activation="relu", kernel_regularizer=reg),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dense(32, activation="relu", kernel_regularizer=reg),
+        tf.keras.layers.BatchNormalization(),
+        tf.keras.layers.Dense(n_classes, activation="softmax")
+    ], name="ModeloC_L2_BN")
+    model.compile(
+        loss="categorical_crossentropy",
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0005),
+        metrics=["accuracy"]
+    )
+    return model
+ 
+modelos_config = {
+    "ModeloA_Simple":  modelo_A,
+    "ModeloB_Dropout": modelo_B,
+    "ModeloC_L2_BN":   modelo_C,
+}
+ 
+# CALLBACK
+EPOCHS     = 100
+BATCH_SIZE = 128
+ 
+early_stop = tf.keras.callbacks.EarlyStopping(
+    monitor="val_loss",
+    patience=20,
+    restore_best_weights=True,
+    verbose=1
+)
+ 
+# ENTRENAMIENTO
+resultados = {}
+ 
+for nombre, build_fn in modelos_config.items():
+    print(f"  Entrenando: {nombre}")
+ 
+    model = build_fn()
+    model.summary()
+ 
+    history = model.fit(
+        X_train, y_train_cat,
+        epochs=EPOCHS,
+        batch_size=BATCH_SIZE,
+        validation_data=(X_val, y_val_cat),
+        class_weight=class_weight_dict,
+        callbacks=[early_stop],
+        verbose=1
+    )
+ 
+    epocas_reales = len(history.history["loss"])
+ 
+    y_val_pred  = np.argmax(model.predict(X_val,  verbose=0), axis=1)
+    y_test_pred = np.argmax(model.predict(X_test, verbose=0), axis=1)
+ 
+    val_acc  = accuracy_score(y_val,  y_val_pred)
+    val_f1   = f1_score(y_val,  y_val_pred, average="macro")
+    test_acc = accuracy_score(y_test, y_test_pred)
+    test_f1  = f1_score(y_test, y_test_pred, average="macro")
+ 
+    print(f"\n  Accuracy: {val_acc:.4f} | F1-macro: {val_f1:.4f}")
+    print(f"  Accuracy: {test_acc:.4f} | F1-macro: {test_f1:.4f}")
+    print(f"\n{classification_report(y_test, y_test_pred, target_names=label_names, digits=4)}")
+ 
+    # Curva de aprendizaje
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+    fig.suptitle(f"{nombre} - Curvas de aprendizaje", fontsize=12, fontweight="bold")
+    axes[0].plot(history.history["loss"],     label="Train", color="#2563eb")
+    axes[0].plot(history.history["val_loss"], label="Val",   color="#dc2626")
+    axes[0].set_title("Loss (categorical_crossentropy)")
+    axes[0].set_xlabel("Época"); axes[0].legend(); axes[0].grid(alpha=0.3)
+    axes[1].plot(history.history["accuracy"],     label="Train", color="#2563eb")
+    axes[1].plot(history.history["val_accuracy"], label="Val",   color="#dc2626")
+    axes[1].set_title("Accuracy")
+    axes[1].set_xlabel("Época"); axes[1].legend(); axes[1].grid(alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(f"curva_{nombre}.png", dpi=110, bbox_inches="tight")
+    plt.close()
+    print(f"  Curva guardada: curva_{nombre}.png")
+ 
+    # Matriz de confusión
+    fig, ax = plt.subplots(figsize=(6, 5))
+    sns.heatmap(confusion_matrix(y_test, y_test_pred), annot=True, fmt="d", cmap="Blues",
+                xticklabels=label_names, yticklabels=label_names, ax=ax)
+    ax.set_title(f"{nombre} — Matriz de confusión (Test)", fontweight="bold")
+    ax.set_ylabel("Real"); ax.set_xlabel("Predicho")
+    plt.tight_layout()
+    plt.savefig(f"confusion_{nombre}.png", dpi=110, bbox_inches="tight")
+    plt.close()
+    print(f"  Confusión guardada: confusion_{nombre}.png")
+ 
+    model.save(f"modelo_{nombre}.keras")
+    print(f"  Modelo guardado: modelo_{nombre}.keras")
+ 
+    resultados[nombre] = {
+        "val_accuracy":  val_acc,  "val_f1_macro":  val_f1,
+        "test_accuracy": test_acc, "test_f1_macro": test_f1,
+        "epocas":        epocas_reales,
+    }
+ 
+# COMPARACIÓN
+
+print("COMPARACIÓN DE MODELOS")
+print(f"{'Modelo':<22} {'Val Acc':>8} {'Val F1':>8} {'Test Acc':>9} {'Test F1':>8} {'Épocas':>7}")
+ 
+mejor_nombre, mejor_f1 = None, -1
+for nombre, r in resultados.items():
+    marca = ""
+    if r["test_f1_macro"] > mejor_f1:
+        mejor_f1, mejor_nombre = r["test_f1_macro"], nombre
+    print(f"{nombre:<22} {r['val_accuracy']:>8.4f} {r['val_f1_macro']:>8.4f} "
+          f"{r['test_accuracy']:>9.4f} {r['test_f1_macro']:>8.4f} "
+          f"{r['epocas']:>7}{marca}")
+ 
+print(f"\n Mejor modelo: {mejor_nombre} (F1 - macro test: {mejor_f1:.4f})")
+ 
+######################################## FIN PREGUNTA VARIABLES DE COLEGIOS ##########################################
