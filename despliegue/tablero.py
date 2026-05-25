@@ -252,6 +252,10 @@ tab_pregunta_1 = html.Div(
 # Tab 2 - Brecha digital y hogar
 # ======================================================
 
+# ======================================================
+# Tab 2 - Brecha digital y hogar
+# ======================================================
+
 tab_pregunta_2 = html.Div(
     style={
         "fontFamily": "Arial",
@@ -261,7 +265,10 @@ tab_pregunta_2 = html.Div(
     children=[
         html.H2(
             "Brecha digital y hogar",
-            style={"color": COLOR_AZUL, "marginBottom": "20px"}
+            style={
+                "color": COLOR_AZUL,
+                "marginBottom": "20px"
+            }
         ),
 
         html.Div(
@@ -291,9 +298,9 @@ tab_pregunta_2 = html.Div(
                                 html.P(
                                     "Esta sección analiza si las condiciones de brecha digital y del hogar "
                                     "permiten clasificar a los estudiantes del Cauca según su probabilidad "
-                                    "de presentar bajo desempeño en las pruebas Saber 11. Para esto, se requiere si " 
-                                    "el estudiante tiene acceso a computador, internet, el estrato de "
-                                    "la vivienda y número de personas en el hogar, con el fin de apoyar la "
+                                    "de presentar bajo desempeño en las pruebas Saber 11. Para esto, se requiere "
+                                    "conocer si el estudiante tiene acceso a computador e internet, el estrato de "
+                                    "la vivienda y el número de personas en el hogar, con el fin de apoyar la "
                                     "identificación temprana de perfiles estudiantiles que podrían requerir "
                                     "mayor acompañamiento académico o tecnológico.",
                                     style={
@@ -395,7 +402,7 @@ tab_pregunta_2 = html.Div(
                 ),
 
                 # ======================================================
-                # Columna derecha: resultado + conclusión
+                # Columna derecha: resultado + conclusión + recordatorio
                 # ======================================================
                 html.Div(
                     children=[
@@ -412,7 +419,10 @@ tab_pregunta_2 = html.Div(
                                 html.P(
                                     "Ingrese los datos del estudiante y presione 'Ejecutar modelo' "
                                     "para obtener la predicción.",
-                                    style={"color": "#555", "fontSize": "16px"}
+                                    style={
+                                        "color": "#555",
+                                        "fontSize": "16px"
+                                    }
                                 )
                             ]
                         ),
@@ -428,7 +438,56 @@ tab_pregunta_2 = html.Div(
                                 ),
                                 html.P(
                                     "La conclusión se generará después de ejecutar el modelo.",
-                                    style={"color": "#555", "fontSize": "16px"}
+                                    style={
+                                        "color": "#555",
+                                        "fontSize": "16px"
+                                    }
+                                )
+                            ]
+                        ),
+
+                        # 5. Recordatorio
+                        html.Div(
+                            style={
+                                **card_style,
+                                "display": "flex",
+                                "alignItems": "center",
+                                "gap": "18px",
+                                "backgroundColor": "#EFF6FF",
+                                "border": "1.5px solid #93C5FD"
+                            },
+                            children=[
+                                html.Img(
+                                    src="/assets/campana.png",
+                                    style={
+                                        "width": "58px",
+                                        "height": "58px",
+                                        "objectFit": "contain"
+                                    }
+                                ),
+
+                                html.Div(
+                                    children=[
+                                        html.H3(
+                                            "5. Recordatorio",
+                                            style={
+                                                "color": COLOR_AZUL,
+                                                "marginTop": "0px",
+                                                "marginBottom": "8px"
+                                            }
+                                        ),
+                                        html.P(
+                                            "Este modelo es una herramienta de alerta temprana para priorizar "
+                                            "seguimiento académico y apoyo tecnológico, y no un mecanismo "
+                                            "definitivo de clasificación individual.",
+                                            style={
+                                                "fontSize": "16px",
+                                                "lineHeight": "1.6",
+                                                "margin": "0px",
+                                                "textAlign": "justify"
+                                            }
+                                        )
+                                    ]
                                 )
                             ]
                         )
@@ -438,8 +497,6 @@ tab_pregunta_2 = html.Div(
         )
     ]
 )
-
-
 
 tab_pregunta_3 = html.Div(
     style={
@@ -566,8 +623,8 @@ def predecir_brecha_digital(n_clicks, computador, internet, estrato, personas):
     probabilidad = float(modelo_brecha.predict(entrada, verbose=0)[0][0])
     porcentaje = probabilidad * 100
 
-    if probabilidad < 0.40:
-        riesgo = "bajo"
+    if probabilidad < 0.30:
+        riesgo = "Bajo"
         color_fondo = "#DCFCE7"   # verde claro
         color_texto = "#166534"
         conclusion = (
@@ -576,8 +633,8 @@ def predecir_brecha_digital(n_clicks, computador, internet, estrato, personas):
             "seguimiento general al estudiante."
         )
 
-    elif probabilidad < 0.60:
-        riesgo = "medio"
+    elif probabilidad < 0.550:
+        riesgo = "Medio"
         color_fondo = "#FEF9C3"   # amarillo claro
         color_texto = "#854D0E"
         conclusion = (
@@ -587,7 +644,7 @@ def predecir_brecha_digital(n_clicks, computador, internet, estrato, personas):
         )
 
     else:
-        riesgo = "alto"
+        riesgo = "Alto"
         color_fondo = "#FEE2E2"   # rojo claro
         color_texto = "#991B1B"
         conclusion = (
