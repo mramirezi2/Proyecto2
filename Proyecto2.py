@@ -260,7 +260,7 @@ X_test_manu_scaled = scaler_manu.transform(X_test_manu)
 #Configurar experimento en MLflow
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment("modelo_manuela")
-nombre_exp = "corrida_codigo"
+nombre_exp = "Mejor_modelo_manuela"
 with mlflow.start_run(run_name=nombre_exp):
     #Registrar parámetros del modelo
     mlflow.log_param("modelo", "secuencial")
@@ -328,3 +328,29 @@ with mlflow.start_run(run_name=nombre_exp):
 
     #Imprimir métricas
     #print(f"MAE: {mae_manu}, MSE: {mse_manu}, R2: {r2_manu}")
+
+#Guardar mejor modelo en Keras
+#Crear carpeta de modelos
+import os
+
+os.makedirs("modelo_manuela", exist_ok=True)
+
+#Guardar mejor modelo
+modelo_manuela.save("modelo_manuela/modelo_final_manuela.keras")
+
+print("Modelo guardado correctamente")
+
+#Variables
+variables_modelo_manu = pd.DataFrame({
+    "orden": range(1, len(x_mmanu.columns) + 1),
+    "variable": x_mmanu.columns
+})
+ruta_variables_manu = "modelo_manuela/variables_modelo_manuela.csv"
+variables_modelo_manu.to_csv(ruta_variables_manu,index=False)
+
+#Scaler
+import joblib
+joblib.dump(scaler_manu,"modelo_manuela/scaler_manuela.pkl")
+print("Scaler guardado correctamente")
+
+print("\nVariables del modelo guardadas en:",ruta_variables_manu)
