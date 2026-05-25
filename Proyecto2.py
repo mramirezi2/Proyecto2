@@ -80,9 +80,6 @@ df["promedio_areas"] = df[cols_areas].mean(axis=1)
 
 ###FIN DE LIMPIEZA DE DATOS###
 
-###MODELO DE REGRESIÓN LINEAL - MANUELA###
-
-
 ######################################## PREGUNTA VARIABLES DE COLEGIOS ##########################################
 
 from sklearn.model_selection import train_test_split
