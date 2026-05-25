@@ -227,10 +227,11 @@ df_manuela["recursos_hogar"] = df_manuela["carro"] + df_manuela["lavadora"]
 
 #Preparar los datos para el modelo de regresión lineal 
 #Importar librerías para el modelo
-import tensorflow as tf
-from tensorflow import keras
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from tensorflow import keras
+import mlflow
 
 #Crear df final para el modelo 
 df_mmanuela = df_manuela.drop(columns=["puntaje"])
@@ -255,39 +256,71 @@ X_train_manu_scaled = scaler_manu.fit_transform(X_train_manu)
 X_valid_manu_scaled = scaler_manu.transform(X_valid_manu)
 X_test_manu_scaled = scaler_manu.transform(X_test_manu)
 
-#Crear modelo
-modelo_manuela = keras.models.Sequential([
-    keras.layers.Input(shape=(X_train_manu_scaled.shape[1],)),
-    keras.layers.Dense(64, activation="relu"),
-    keras.layers.Dense(32, activation="relu"),
-    keras.layers.Dense(1)
-])
+#Configurar experimento en MLflow
+mlflow.set_experiment("modelo_manuela")
+with mlflow.start_run(run_name="modelo_base_manuela"):
+    #Registrar parámetros del modelo
+    mlflow.log_param("modelo", "secuencial")
+    mlflow.log_param("capas", "64, 32, 1")
+    mlflow.log_param("activacion", "relu")
+    mlflow.log_param("optimizador", "adam")
+    mlflow.log_param("loss", "mse")
+    mlflow.log_param("epochs", 20)
 
-#Compilar modelo 
-modelo_manuela.compile(
-    loss = "mse",
-    optimizer = "adam"
-)
+    #Crear modelo
+    modelo_manuela = keras.models.Sequential([
+        keras.layers.Input(shape=(X_train_manu_scaled.shape[1],)),
+        keras.layers.Dense(64, activation="relu"),
+        keras.layers.Dense(32, activation="relu"),
+        keras.layers.Dense(1)
+    ])
 
-print(modelo_manuela.summary())
+    #Compilar modelo 
+    modelo_manuela.compile(
+        loss = "mse",
+        optimizer = "adam",
+        metrics = ["mae"]
+    )
 
-#Entrenar el modelo
-hist_mmanu = modelo_manuela.fit(X_train_manu_scaled, y_train_manu, 
-                                epochs=20,
-                                validation_data=(X_valid_manu_scaled, y_valid_manu)) 
+    print(modelo_manuela.summary())
 
-#Revisar el historial de entrenamiento
-print(hist_mmanu.history.keys())
-print(hist_mmanu.history["loss"][:5])
-print(hist_mmanu.history["val_loss"][:5])
+    #Entrenar el modelo
+    hist_mmanu = modelo_manuela.fit(X_train_manu_scaled, y_train_manu, 
+                                    epochs=20,
+                                    validation_data=(X_valid_manu_scaled, y_valid_manu)) 
+    
+    #Evaluar modelo
+    y_pred_manu = modelo_manuela.predict(X_test_manu_scaled).ravel()
 
-#Graficar historial de pérdida
-plt.figure(figsize=(8,5))
-plt.plot(hist_mmanu.history["loss"], label="Train loss")
-plt.plot(hist_mmanu.history["val_loss"], label="Validation loss")
-plt.xlabel("Épocas")
-plt.ylabel("Pérdida")
-plt.title("Historial de pérdida - Modelo base")
-plt.legend()
-plt.grid(True)
-plt.show()  
+    mae_manu = mean_absolute_error(y_test_manu, y_pred_manu)
+    mse_manu = mean_squared_error(y_test_manu, y_pred_manu)
+    rmse_manu = np.sqrt(mse_manu)
+    r2_manu = r2_score(y_test_manu, y_pred_manu)
+
+    #Registrar métricas en MLflow
+    mlflow.log_metric("MAE", mae_manu)
+    mlflow.log_metric("MSE", mse_manu)
+    mlflow.log_metric("RMSE", rmse_manu)
+    mlflow.log_metric("R2", r2_manu)
+
+    #Graficar historial de pérdida
+    plt.figure(figsize=(8,5))
+    plt.plot(hist_mmanu.history["loss"], label="Train loss")
+    plt.plot(hist_mmanu.history["val_loss"], label="Validation loss")
+    plt.xlabel("Épocas")
+    plt.ylabel("Pérdida")
+    plt.title("Historial de pérdida - Modelo base")
+    plt.legend()
+    plt.grid(True)
+
+    #Guardar gráfico y registrar en MLflow
+    plt.tight_layout()
+    plt.savefig("loss_modelo_base_manuela.png")
+    mlflow.log_artifact("loss_modelo_base_manuela.png")
+    plt.show() 
+
+    #Guardar modelo
+    mlflow.keras.log_model(modelo_manuela, "modelo_manuela")
+
+    #Imprimir métricas
+    print(f"MAE: {mae_manu}, MSE: {mse_manu}, R2: {r2_manu}")
