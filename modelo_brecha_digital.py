@@ -199,12 +199,12 @@ arquitecturas = {
     },
     "Modelo_2_intermedio": {
         "capas": [16, 8],
-        "dropout": 0.1,
+        "dropout": 0.0,
         "learning_rate": 0.001
     },
     "Modelo_3_profundo": {
         "capas": [32, 16, 8],
-        "dropout": 0.2,
+        "dropout": 0.0,
         "learning_rate": 0.001
     }}
 
@@ -214,6 +214,8 @@ arquitecturas = {
 
 resultados = []
 modelos_entrenados = {}
+
+historiales_entrenamiento = {}
 
 for nombre, config in arquitecturas.items():
 
@@ -241,6 +243,7 @@ for nombre, config in arquitecturas.items():
         callbacks=[early_stopping],
         class_weight=class_weight,
         verbose=0)
+    historiales_entrenamiento[nombre] = historial
 
     # Predicciones en validación
     y_val_prob = modelo.predict(X_val_np, verbose=0)
@@ -363,3 +366,72 @@ ruta_variables = "resultados/variables_modelo_brecha_digital.csv"
 variables_modelo.to_csv(ruta_variables, index=False)
 
 print("\nVariables del modelo guardadas en:", ruta_variables)
+
+# ======================================================
+# 18. Gráficas de evaluación del mejor modelo
+# ======================================================
+
+import os
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+# Crear carpeta para guardar gráficas
+os.makedirs("resultados/graficas", exist_ok=True)
+
+# Recuperar historial del mejor modelo
+historial_mejor = historiales_entrenamiento[mejor_modelo_nombre]
+
+# ======================================================
+# 18.1 Curva de pérdida
+# ======================================================
+
+plt.figure(figsize=(8, 5))
+plt.plot(historial_mejor.history["loss"], label="Entrenamiento")
+plt.plot(historial_mejor.history["val_loss"], label="Validación")
+plt.title(f"{mejor_modelo_nombre} - Curva de pérdida")
+plt.xlabel("Época")
+plt.ylabel("Binary Crossentropy")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.savefig("resultados/graficas/loss_brecha_digital.png", dpi=300)
+plt.show()
+
+
+# ======================================================
+# 18.2 Curva de accuracy
+# ======================================================
+
+plt.figure(figsize=(8, 5))
+plt.plot(historial_mejor.history["accuracy"], label="Entrenamiento")
+plt.plot(historial_mejor.history["val_accuracy"], label="Validación")
+plt.title(f"{mejor_modelo_nombre} - Curva de accuracy")
+plt.xlabel("Época")
+plt.ylabel("Accuracy")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.savefig("resultados/graficas/accuracy_brecha_digital.png", dpi=300)
+plt.show()
+
+
+# ======================================================
+# 18.3 Matriz de confusión en prueba
+# ======================================================
+
+y_test_prob = mejor_modelo.predict(X_test_np, verbose=0).ravel()
+y_test_pred = (y_test_prob >= 0.5).astype(int)
+
+matriz = confusion_matrix(y_test_np, y_test_pred)
+
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=matriz,
+    display_labels=["No bajo desempeño", "Bajo desempeño"]
+)
+
+fig, ax = plt.subplots(figsize=(6, 5))
+disp.plot(cmap="Blues", values_format="d", ax=ax)
+plt.title(f"{mejor_modelo_nombre} - Matriz de confusión en prueba")
+plt.tight_layout()
+plt.savefig("resultados/graficas/matriz_confusion_brecha_digital.png", dpi=300)
+plt.show()
