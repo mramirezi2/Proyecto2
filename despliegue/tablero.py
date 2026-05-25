@@ -232,10 +232,6 @@ tab_portada = html.Div(
 # Tab 2 - Brecha digital y hogar
 # ======================================================
 
-# ======================================================
-# Tab 2 - Brecha digital y hogar
-# ======================================================
-
 tab_pregunta_2 = html.Div(
     style={
         "fontFamily": "Arial",
@@ -382,7 +378,7 @@ tab_pregunta_2 = html.Div(
                 ),
 
                 # ======================================================
-                # Columna derecha: resultado + conclusión + recordatorio
+                # Columna derecha: resultado + conclusión + recordatorio + modelo
                 # ======================================================
                 html.Div(
                     children=[
@@ -470,6 +466,196 @@ tab_pregunta_2 = html.Div(
                                     ]
                                 )
                             ]
+                        ),
+
+                        # 6. Sobre el modelo
+                        html.Div(
+                            style={
+                                **card_style,
+                                "backgroundColor": "#FFFFFF",
+                                "border": "1px solid #CBD5E1"
+                            },
+                            children=[
+                                html.H3(
+                                    "6. Sobre el modelo",
+                                    style={
+                                        "color": COLOR_AZUL,
+                                        "marginTop": "0px",
+                                        "marginBottom": "18px"
+                                    }
+                                ),
+
+                                html.Div(
+                                    style={
+                                        "display": "grid",
+                                        "gridTemplateColumns": "repeat(auto-fit, minmax(160px, 1fr))",
+                                        "gap": "14px",
+                                        "marginBottom": "16px"
+                                    },
+                                    children=[
+                                        html.Div(
+                                            style={
+                                                "backgroundColor": "#F1F5F9",
+                                                "border": "1px solid #CBD5E1",
+                                                "borderRadius": "10px",
+                                                "padding": "14px",
+                                                "textAlign": "center"
+                                            },
+                                            children=[
+                                                html.P(
+                                                    "Modelo",
+                                                    style={
+                                                        "margin": "0px",
+                                                        "fontSize": "13px",
+                                                        "color": "#475569",
+                                                        "fontWeight": "bold"
+                                                    }
+                                                ),
+                                                html.H4(
+                                                    "Modelo 1 Simple",
+                                                    style={
+                                                        "margin": "8px 0px 0px 0px",
+                                                        "color": COLOR_AZUL
+                                                    }
+                                                )
+                                            ]
+                                        ),
+
+                                        html.Div(
+                                            style={
+                                                "backgroundColor": "#F1F5F9",
+                                                "border": "1px solid #CBD5E1",
+                                                "borderRadius": "10px",
+                                                "padding": "14px",
+                                                "textAlign": "center"
+                                            },
+                                            children=[
+                                                html.P(
+                                                    "Red neuronal",
+                                                    style={
+                                                        "margin": "0px",
+                                                        "fontSize": "13px",
+                                                        "color": "#475569",
+                                                        "fontWeight": "bold"
+                                                    }
+                                                ),
+                                                html.H4(
+                                                    "Normalización + 8 ReLU",
+                                                    style={
+                                                        "margin": "8px 0px 0px 0px",
+                                                        "color": COLOR_AZUL
+                                                    }
+                                                )
+                                            ]
+                                        ),
+
+                                        html.Div(
+                                            style={
+                                                "backgroundColor": "#F1F5F9",
+                                                "border": "1px solid #CBD5E1",
+                                                "borderRadius": "10px",
+                                                "padding": "14px",
+                                                "textAlign": "center"
+                                            },
+                                            children=[
+                                                html.P(
+                                                    "Accuracy",
+                                                    style={
+                                                        "margin": "0px",
+                                                        "fontSize": "13px",
+                                                        "color": "#475569",
+                                                        "fontWeight": "bold"
+                                                    }
+                                                ),
+                                                html.H4(
+                                                    "0.54",
+                                                    style={
+                                                        "margin": "8px 0px 0px 0px",
+                                                        "color": COLOR_AZUL
+                                                    }
+                                                )
+                                            ]
+                                        ),
+
+                                        html.Div(
+                                            style={
+                                                "backgroundColor": "#F1F5F9",
+                                                "border": "1px solid #CBD5E1",
+                                                "borderRadius": "10px",
+                                                "padding": "14px",
+                                                "textAlign": "center"
+                                            },
+                                            children=[
+                                                html.P(
+                                                    "F1 ponderado",
+                                                    style={
+                                                        "margin": "0px",
+                                                        "fontSize": "13px",
+                                                        "color": "#475569",
+                                                        "fontWeight": "bold"
+                                                    }
+                                                ),
+                                                html.H4(
+                                                    "0.56",
+                                                    style={
+                                                        "margin": "8px 0px 0px 0px",
+                                                        "color": COLOR_AZUL
+                                                    }
+                                                )
+                                            ]
+                                        ),
+
+                                        html.Div(
+                                            style={
+                                                "backgroundColor": "#F1F5F9",
+                                                "border": "1px solid #CBD5E1",
+                                                "borderRadius": "10px",
+                                                "padding": "14px",
+                                                "textAlign": "center"
+                                            },
+                                            children=[
+                                                html.P(
+                                                    "Recall bajo desempeño",
+                                                    style={
+                                                        "margin": "0px",
+                                                        "fontSize": "13px",
+                                                        "color": "#475569",
+                                                        "fontWeight": "bold"
+                                                    }
+                                                ),
+                                                html.H4(
+                                                    "0.81",
+                                                    style={
+                                                        "margin": "8px 0px 0px 0px",
+                                                        "color": COLOR_AZUL
+                                                    }
+                                                )
+                                            ]
+                                        )
+                                    ]
+                                ),
+
+                                html.Div(
+                                    style={
+                                        "borderLeft": f"4px solid {COLOR_AZUL}",
+                                        "paddingLeft": "12px",
+                                        "marginTop": "10px"
+                                    },
+                                    children=[
+                                        html.P(
+                                            "Nota: el modelo identifica una proporción alta de estudiantes con bajo desempeño "
+                                            "según el recall de 0.81. Sin embargo, su desempeño general es moderado, por lo que "
+                                            "debe interpretarse como apoyo para la priorización y no como una decisión definitiva.",
+                                            style={
+                                                "fontSize": "15px",
+                                                "lineHeight": "1.5",
+                                                "margin": "0px",
+                                                "textAlign": "justify"
+                                            }
+                                        )
+                                    ]
+                                )
+                            ]
                         )
                     ]
                 )
@@ -477,6 +663,170 @@ tab_pregunta_2 = html.Div(
         )
     ]
 )
+
+
+# ======================================================
+# Callback - Modelo brecha digital
+# ======================================================
+
+@app.callback(
+    Output("tarjeta-probabilidad-brecha", "children"),
+    Output("tarjeta-probabilidad-brecha", "style"),
+    Output("conclusion-brecha", "children"),
+    Input("boton-brecha", "n_clicks"),
+    State("brecha-computador", "value"),
+    State("brecha-internet", "value"),
+    State("brecha-estrato", "value"),
+    State("brecha-personas", "value")
+)
+def predecir_brecha_digital(n_clicks, computador, internet, estrato, personas):
+
+    estilo_base = card_style.copy()
+
+    if n_clicks == 0:
+        return (
+            [
+                html.H3(
+                    "3. Probabilidad de bajo desempeño",
+                    style={"color": COLOR_AZUL}
+                ),
+                html.P(
+                    "Ingrese los datos del estudiante y presione 'Ejecutar modelo' "
+                    "para obtener la predicción.",
+                    style={
+                        "color": "#555",
+                        "fontSize": "16px"
+                    }
+                )
+            ],
+            estilo_base,
+            [
+                html.H3(
+                    "4. Conclusión",
+                    style={"color": COLOR_AZUL}
+                ),
+                html.P(
+                    "La conclusión se generará después de ejecutar el modelo.",
+                    style={
+                        "color": "#555",
+                        "fontSize": "16px"
+                    }
+                )
+            ]
+        )
+
+    entrada = np.array(
+        [[computador, internet, estrato, personas]],
+        dtype="float32"
+    )
+
+    probabilidad = float(modelo_brecha.predict(entrada, verbose=0)[0][0])
+    porcentaje = probabilidad * 100
+
+    if probabilidad < 0.30:
+        riesgo = "bajo"
+        color_fondo = "#DCFCE7"
+        color_texto = "#166534"
+        conclusion = (
+            "El perfil ingresado presenta un riesgo bajo de bajo desempeño. "
+            "Aunque no se identifica una alerta prioritaria, se recomienda mantener "
+            "seguimiento general al estudiante."
+        )
+
+    elif probabilidad < 0.55:
+        riesgo = "medio"
+        color_fondo = "#FEF9C3"
+        color_texto = "#854D0E"
+        conclusion = (
+            "El perfil ingresado presenta un riesgo medio de bajo desempeño. "
+            "Esto sugiere la conveniencia de realizar seguimiento preventivo y revisar "
+            "posibles necesidades de acompañamiento académico o tecnológico."
+        )
+
+    else:
+        riesgo = "alto"
+        color_fondo = "#FEE2E2"
+        color_texto = "#991B1B"
+        conclusion = (
+            "El perfil ingresado presenta un riesgo alto de bajo desempeño. "
+            "Este resultado puede servir como alerta temprana para priorizar estrategias "
+            "de acompañamiento académico y apoyo en acceso a recursos tecnológicos."
+        )
+
+    estilo_resultado = card_style.copy()
+    estilo_resultado["backgroundColor"] = color_fondo
+    estilo_resultado["border"] = f"2px solid {color_texto}"
+
+    contenido_resultado = [
+        html.H3(
+            "3. Probabilidad de bajo desempeño",
+            style={"color": color_texto}
+        ),
+
+        html.Div(
+            style={
+                "textAlign": "center",
+                "padding": "20px"
+            },
+            children=[
+                html.H1(
+                    f"{porcentaje:.1f}%",
+                    style={
+                        "fontSize": "64px",
+                        "color": color_texto,
+                        "margin": "10px 0px"
+                    }
+                ),
+
+                html.H3(
+                    f"Riesgo {riesgo}",
+                    style={
+                        "color": color_texto,
+                        "textTransform": "uppercase",
+                        "marginBottom": "20px"
+                    }
+                ),
+
+                html.P(
+                    f"El estudiante tiene un porcentaje del {porcentaje:.1f}% "
+                    "de tener un bajo desempeño según su acceso a computador e internet, "
+                    "su estrato y las personas con las que vive.",
+                    style={
+                        "fontSize": "17px",
+                        "lineHeight": "1.6",
+                        "textAlign": "justify"
+                    }
+                ),
+
+                html.P(
+                    f"Esto se puede interpretar como un riesgo {riesgo}.",
+                    style={
+                        "fontSize": "18px",
+                        "fontWeight": "bold",
+                        "color": color_texto,
+                        "marginTop": "18px"
+                    }
+                )
+            ]
+        )
+    ]
+
+    contenido_conclusion = [
+        html.H3(
+            "4. Conclusión",
+            style={"color": COLOR_AZUL}
+        ),
+        html.P(
+            conclusion,
+            style={
+                "fontSize": "16px",
+                "lineHeight": "1.6",
+                "textAlign": "justify"
+            }
+        )
+    ]
+
+    return contenido_resultado, estilo_resultado, contenido_conclusion
 
 tab_pregunta_3 = html.Div(
     style={
@@ -555,156 +905,6 @@ def renderizar_tabs(tab):
 # ======================================================
 # Ejecución local
 # ======================================================
-# ======================================================
-# Callback - Modelo brecha digital
-# ======================================================
-
-@app.callback(
-    Output("tarjeta-probabilidad-brecha", "children"),
-    Output("tarjeta-probabilidad-brecha", "style"),
-    Output("conclusion-brecha", "children"),
-    Input("boton-brecha", "n_clicks"),
-    State("brecha-computador", "value"),
-    State("brecha-internet", "value"),
-    State("brecha-estrato", "value"),
-    State("brecha-personas", "value")
-)
-def predecir_brecha_digital(n_clicks, computador, internet, estrato, personas):
-
-    estilo_base = card_style.copy()
-
-    if n_clicks == 0:
-        return (
-            [
-                html.H3(
-                    "3. Probabilidad de bajo desempeño",
-                    style={"color": COLOR_AZUL}
-                ),
-                html.P(
-                    "Ingrese los datos del estudiante y presione 'Ejecutar modelo' "
-                    "para obtener la predicción.",
-                    style={"color": "#555", "fontSize": "16px"}
-                )
-            ],
-            estilo_base,
-            [
-                html.H3("4. Conclusión", style={"color": COLOR_AZUL}),
-                html.P(
-                    "La conclusión se generará después de ejecutar el modelo.",
-                    style={"color": "#555", "fontSize": "16px"}
-                )
-            ]
-        )
-
-    entrada = np.array(
-        [[computador, internet, estrato, personas]],
-        dtype="float32"
-    )
-
-    probabilidad = float(modelo_brecha.predict(entrada, verbose=0)[0][0])
-    porcentaje = probabilidad * 100
-
-    if probabilidad < 0.30:
-        riesgo = "Bajo"
-        color_fondo = "#DCFCE7"   # verde claro
-        color_texto = "#166534"
-        conclusion = (
-            "El perfil ingresado presenta un riesgo bajo de bajo desempeño. "
-            "Aunque no se identifica una alerta prioritaria, se recomienda mantener "
-            "seguimiento general al estudiante."
-        )
-
-    elif probabilidad < 0.550:
-        riesgo = "Medio"
-        color_fondo = "#FEF9C3"   # amarillo claro
-        color_texto = "#854D0E"
-        conclusion = (
-            "El perfil ingresado presenta un riesgo medio de bajo desempeño. "
-            "Esto sugiere la conveniencia de realizar seguimiento preventivo y revisar "
-            "posibles necesidades de acompañamiento académico o tecnológico."
-        )
-
-    else:
-        riesgo = "Alto"
-        color_fondo = "#FEE2E2"   # rojo claro
-        color_texto = "#991B1B"
-        conclusion = (
-            "El perfil ingresado presenta un riesgo alto de bajo desempeño. "
-            "Este resultado puede servir como alerta temprana para priorizar estrategias "
-            "de acompañamiento académico y apoyo en acceso a recursos tecnológicos."
-        )
-
-    estilo_resultado = card_style.copy()
-    estilo_resultado["backgroundColor"] = color_fondo
-    estilo_resultado["border"] = f"2px solid {color_texto}"
-
-    contenido_resultado = [
-        html.H3(
-            "3. Probabilidad de bajo desempeño",
-            style={"color": color_texto}
-        ),
-
-        html.Div(
-            style={
-                "textAlign": "center",
-                "padding": "20px"
-            },
-            children=[
-                html.H1(
-                    f"{porcentaje:.1f}%",
-                    style={
-                        "fontSize": "64px",
-                        "color": color_texto,
-                        "margin": "10px 0px"
-                    }
-                ),
-
-                html.H3(
-                    f"Riesgo {riesgo}",
-                    style={
-                        "color": color_texto,
-                        "textTransform": "uppercase",
-                        "marginBottom": "20px"
-                    }
-                ),
-
-                html.P(
-                    f"El estudiante tiene un porcentaje del {porcentaje:.1f}% "
-                    "de tener un bajo desempeño según su acceso a computador e internet, "
-                    "su estrato y las personas con las que vive.",
-                    style={
-                        "fontSize": "17px",
-                        "lineHeight": "1.6",
-                        "textAlign": "justify"
-                    }
-                ),
-
-                html.P(
-                    f"Esto se puede interpretar como un riesgo {riesgo}.",
-                    style={
-                        "fontSize": "18px",
-                        "fontWeight": "bold",
-                        "color": color_texto,
-                        "marginTop": "18px"
-                    }
-                )
-            ]
-        )
-    ]
-
-    contenido_conclusion = [
-        html.H3("4. Conclusión", style={"color": COLOR_AZUL}),
-        html.P(
-            conclusion,
-            style={
-                "fontSize": "16px",
-                "lineHeight": "1.6",
-                "textAlign": "justify"
-            }
-        )
-    ]
-
-    return contenido_resultado, estilo_resultado, contenido_conclusion
 
 if __name__ == "__main__":
     app.run(debug=True)
