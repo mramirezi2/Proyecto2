@@ -7,6 +7,7 @@ import dash
 from dash import html, dcc, Input, Output, State
 from pathlib import Path
 from tab_pregunta1 import tab_pregunta_1, registrar_callbacks_p1
+from tab_pregunta_manuela import tab_pregunta_manuela, registrar_callbacks_manuela
 import numpy as np
 import tensorflow as tf
 
@@ -855,6 +856,7 @@ tab_pregunta_3 = html.Div(
 # Layout principal
 # ======================================================
 registrar_callbacks_p1(app)
+registrar_callbacks_manuela(app)
 
 app.layout = html.Div(
     style={
@@ -897,7 +899,8 @@ def renderizar_tabs(tab):
     elif tab == "pregunta_2":
         return tab_pregunta_2
     elif tab == "pregunta_3":
-        return tab_pregunta_3
+        return tab_pregunta_manuela
+
 
     return tab_portada
 
