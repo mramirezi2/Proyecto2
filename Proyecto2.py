@@ -257,13 +257,10 @@ X_train_manu_scaled = scaler_manu.fit_transform(X_train_manu)
 X_valid_manu_scaled = scaler_manu.transform(X_valid_manu)
 X_test_manu_scaled = scaler_manu.transform(X_test_manu)
 
-#Lista para guardar resultados de los modelos
-res_mmodelos = []
-
 #Configurar experimento en MLflow
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment("modelo_manuela")
-nombre_exp = "modelo_grande__manuela"
+nombre_exp = "corrida_codigo"
 with mlflow.start_run(run_name=nombre_exp):
     #Registrar parámetros del modelo
     mlflow.log_param("modelo", "secuencial")
@@ -289,7 +286,7 @@ with mlflow.start_run(run_name=nombre_exp):
         metrics = ["mae"]
     )
 
-    print(modelo_manuela.summary())
+    #print(modelo_manuela.summary())
 
     #Entrenar el modelo
     hist_mmanu = modelo_manuela.fit(X_train_manu_scaled, y_train_manu, 
@@ -330,13 +327,4 @@ with mlflow.start_run(run_name=nombre_exp):
     mlflow.keras.log_model(modelo_manuela, "modelo_manuela")
 
     #Imprimir métricas
-    print(f"MAE: {mae_manu}, MSE: {mse_manu}, R2: {r2_manu}")
-
-    #Guardar resultados del modelo
-    res_mmodelos.append({
-        "modelo": nombre_exp,
-        "MAE": mae_manu,
-        "MSE": mse_manu,
-        "RMSE": rmse_manu,
-        "R2": r2_manu
-    })
+    #print(f"MAE: {mae_manu}, MSE: {mse_manu}, R2: {r2_manu}")
