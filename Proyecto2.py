@@ -266,15 +266,14 @@ modelo_manuela = keras.models.Sequential([
 #Compilar modelo 
 modelo_manuela.compile(
     loss = "mse",
-    optimizer = "adam",
-    metrics = ["mae"]
+    optimizer = "adam"
 )
 
 print(modelo_manuela.summary())
 
 #Entrenar el modelo
 hist_mmanu = modelo_manuela.fit(X_train_manu_scaled, y_train_manu, 
-                                epochs=50,
+                                epochs=20,
                                 validation_data=(X_valid_manu_scaled, y_valid_manu)) 
 
 #Revisar el historial de entrenamiento
