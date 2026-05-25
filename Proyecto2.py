@@ -239,7 +239,7 @@ def modelo_A():
     ], name="ModeloA_Simple")
     model.compile(
         loss="categorical_crossentropy",
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
         metrics=["accuracy"]
     )
     return model
@@ -257,7 +257,7 @@ def modelo_B():
     ], name="ModeloB_Dropout")
     model.compile(
         loss="categorical_crossentropy",
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
         metrics=["accuracy"]
     )
     return model
@@ -276,7 +276,7 @@ def modelo_C():
     ], name="ModeloC_L2_BN")
     model.compile(
         loss="categorical_crossentropy",
-        optimizer=tf.keras.optimizers.Adam(learning_rate=0.0005),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
         metrics=["accuracy"]
     )
     return model
@@ -288,7 +288,7 @@ modelos_config = {
 }
  
 # CALLBACK
-EPOCHS     = 100
+EPOCHS     = 50
 BATCH_SIZE = 128
  
 early_stop = tf.keras.callbacks.EarlyStopping(
