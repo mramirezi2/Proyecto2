@@ -260,6 +260,7 @@ X_test_manu_scaled = scaler_manu.transform(X_test_manu)
 res_mmodelos = []
 
 #Configurar experimento en MLflow
+mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment("modelo_manuela")
 nombre_exp = "modelo_base_manuela"
 with mlflow.start_run(run_name=nombre_exp):
@@ -329,7 +330,7 @@ with mlflow.start_run(run_name=nombre_exp):
     #Imprimir métricas
     print(f"MAE: {mae_manu}, MSE: {mse_manu}, R2: {r2_manu}")
 
-    #Guardar modelo
+    #Guardar resultados del modelo
     res_mmodelos.append({
         "modelo": nombre_exp,
         "MAE": mae_manu,
