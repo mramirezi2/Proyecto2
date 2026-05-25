@@ -6,6 +6,7 @@
 import dash
 from dash import html, dcc, Input, Output
 from pathlib import Path
+from tab_pregunta1 import tab_pregunta_1, registrar_callbacks_p1
 
 # ======================================================
 # Configuración inicial
@@ -209,27 +210,6 @@ tab_portada = html.Div(
 # Tabs para las preguntas
 # ======================================================
 
-tab_pregunta_1 = html.Div(
-    style={
-        "fontFamily": "Arial",
-        "padding": "30px",
-        "backgroundColor": COLOR_GRIS
-    },
-    children=[
-        html.H2("Desempeño institucional", style={"color": COLOR_AZUL}),
-        html.Div(
-            style=card_style,
-            children=[
-                html.H3("Descripción del problema", style={"color": COLOR_AZUL}),
-                html.P(
-                    "En esta sección se integrará el primer modelo predictivo. "
-                    "Aquí se incluirán los campos de entrada, el resultado del modelo "
-                    "y el hallazgo principal asociado a la pregunta de negocio."
-                )
-            ]
-        )
-    ]
-)
 
 
 tab_pregunta_2 = html.Div(
@@ -281,6 +261,7 @@ tab_pregunta_3 = html.Div(
 # ======================================================
 # Layout principal
 # ======================================================
+registrar_callbacks_p1(app)
 
 app.layout = html.Div(
     style={
