@@ -27,7 +27,7 @@ variables_x = ["fami_tienecomputador","fami_tieneinternet","fami_estratovivienda
 variable_y_base = "punt_global"
 
 # Crear dataframe solo con las variables necesarias
-df_modelo = df_brecha[variables_x + [variable_y_base]].copy()
+df_modelo_pau = df_brecha[variables_x + [variable_y_base]].copy()
 
 # ======================================================
 # 4. Limpieza y codificación de variables explicativas
@@ -35,16 +35,16 @@ df_modelo = df_brecha[variables_x + [variable_y_base]].copy()
 
 # Normalizar texto
 for col in ["fami_tienecomputador", "fami_tieneinternet", "fami_personashogar"]:
-    df_modelo[col] = df_modelo[col].astype(str).str.strip().str.lower()
+    df_modelo_pau[col] = df_modelo_pau[col].astype(str).str.strip().str.lower()
 
 # Convertir computador e internet a variables dicotómicas
 mapa_si_no = {"si": 1, "sí": 1, "no": 0}
 
-df_modelo["fami_tienecomputador"] = df_modelo["fami_tienecomputador"].map(mapa_si_no)
-df_modelo["fami_tieneinternet"] = df_modelo["fami_tieneinternet"].map(mapa_si_no)
+df_modelo_pau["fami_tienecomputador"] = df_modelo_pau["fami_tienecomputador"].map(mapa_si_no)
+df_modelo_pau["fami_tieneinternet"] = df_modelo_pau["fami_tieneinternet"].map(mapa_si_no)
 
 # Asegurar que estrato sea numérico
-df_modelo["fami_estratovivienda"] = pd.to_numeric(df_modelo["fami_estratovivienda"],errors="coerce")
+df_modelo_pau["fami_estratovivienda"] = pd.to_numeric(df_modelo_pau["fami_estratovivienda"],errors="coerce")
 
 # Convertir personas del hogar de texto a número
 mapa_personas = {
@@ -63,29 +63,29 @@ mapa_personas = {
     "mas de diez": 10,
     "más de diez": 10}
 
-df_modelo["fami_personashogar"] = df_modelo["fami_personashogar"].map(mapa_personas)
+df_modelo_pau["fami_personashogar"] = df_modelo_pau["fami_personashogar"].map(mapa_personas)
 
 # Asegurar que punt_global sea numérico
-df_modelo["punt_global"] = pd.to_numeric(df_modelo["punt_global"],errors="coerce")
+df_modelo_pau["punt_global"] = pd.to_numeric(df_modelo_pau["punt_global"],errors="coerce")
 
 # Eliminar filas con faltantes después de la codificación
-df_modelo = df_modelo.dropna().copy()
+df_modelo_pau = df_modelo_pau.dropna().copy()
 
 # ======================================================
 # 5. Creación de la variable objetivo: bajo_desempeno
 # ======================================================
 
 # Bajo desempeño = estudiantes en el 25% inferior del puntaje global
-umbral_bajo = df_modelo["punt_global"].quantile(0.25)
+umbral_bajo = df_modelo_pau["punt_global"].quantile(0.25)
 
-df_modelo["bajo_desempeno"] = np.where(df_modelo["punt_global"] <= umbral_bajo,1,0)
+df_modelo_pau["bajo_desempeno"] = np.where(df_modelo_pau["punt_global"] <= umbral_bajo,1,0)
 
 # ======================================================
 # 6. Separar X e y
 # ======================================================
 
-X = df_modelo[["fami_tienecomputador","fami_tieneinternet","fami_estratovivienda","fami_personashogar"]].copy()
-y = df_modelo["bajo_desempeno"].copy()
+X = df_modelo_pau[["fami_tienecomputador","fami_tieneinternet","fami_estratovivienda","fami_personashogar"]].copy()
+y = df_modelo_pau["bajo_desempeno"].copy()
 
 # Verificación
 print("Umbral de bajo desempeño:", umbral_bajo)
@@ -467,15 +467,15 @@ plt.show()
 # 19. Guardar artefactos del mejor modelo en MLflow
 # ======================================================
 
-with mlflow.start_run(run_id=run_ids[mejor_modelo_nombre]):
+#with mlflow.start_run(run_id=run_ids[mejor_modelo_nombre]):
 
-    mlflow.log_artifact(ruta_resultados)
-    mlflow.log_artifact(ruta_variables)
-    mlflow.log_artifact(ruta_modelo)
+ #   mlflow.log_artifact(ruta_resultados)
+  #  mlflow.log_artifact(ruta_variables)
+   # mlflow.log_artifact(ruta_modelo)
 
-    mlflow.log_artifacts(
-        "resultados/graficas",
-        artifact_path="graficas"
-    )
+   # mlflow.log_artifacts(
+    #    "resultados/graficas",
+     #   artifact_path="graficas"
+    #)
 
-print("\nArtefactos del mejor modelo registrados en MLflow.")
+# print("\nArtefactos del mejor modelo registrados en MLflow.")
