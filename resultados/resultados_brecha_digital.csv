@@ -1,0 +1,4 @@
+Modelo,Arquitectura,Dropout,Val Acc,Val F1,Test Acc,Test F1,Épocas entrenadas,Mejor época según Val Loss
+Modelo_2_intermedio,"[16, 8]",0.1,0.5068,0.4222,0.5369,0.4701,13,3
+Modelo_1_simple,[8],0.0,0.5023,0.4107,0.5459,0.4772,41,31
+Modelo_3_profundo,"[32, 16, 8]",0.2,0.6171,0.3089,0.6486,0.3849,11,1
