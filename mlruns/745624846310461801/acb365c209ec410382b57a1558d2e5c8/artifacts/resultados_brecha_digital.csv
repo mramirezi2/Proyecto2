@@ -1,0 +1,4 @@
+Modelo,Arquitectura,Dropout,Val Acc,Val F1,Test Acc,Test F1,Épocas
+Modelo_3_profundo,"[32, 16, 8]",0.1,0.491,0.4084,0.5279,0.4653,50
+Modelo_1_simple,[8],0.1,0.5,0.4032,0.5477,0.4782,50
+Modelo_2_intermedio,"[16, 8]",0.1,0.491,0.3989,0.5279,0.4631,50

@@ -1,0 +1,15 @@
+artifact_uri: file:C:/Users/paula/OneDrive/Desktop/Andes/8 semestre/Analitica/Proyecto
+  2/Proyecto2/mlruns/745624846310461801/df8ec3fe9ba249c6afc6bf26cd89b5d8/artifacts
+end_time: 1779731849978
+entry_point_name: ''
+experiment_id: '745624846310461801'
+lifecycle_stage: active
+run_id: df8ec3fe9ba249c6afc6bf26cd89b5d8
+run_name: Modelo_1_simple
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779731849812
+status: 3
+tags: []
+user_id: paula
