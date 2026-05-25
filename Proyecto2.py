@@ -231,6 +231,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from tensorflow import keras
+from keras.optimizers import Adam
 import mlflow
 
 #Crear df final para el modelo 
@@ -262,19 +263,20 @@ res_mmodelos = []
 #Configurar experimento en MLflow
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment("modelo_manuela")
-nombre_exp = "modelo_base_manuela"
+nombre_exp = "modelo_grande__manuela"
 with mlflow.start_run(run_name=nombre_exp):
     #Registrar parámetros del modelo
     mlflow.log_param("modelo", "secuencial")
-    mlflow.log_param("capas", "64, 32, 1")
+    mlflow.log_param("capas", "128, 64, 32, 1")
     mlflow.log_param("activacion", "relu")
     mlflow.log_param("optimizador", "adam")
     mlflow.log_param("loss", "mse")
-    mlflow.log_param("epochs", 20)
+    mlflow.log_param("epochs", 50)
 
     #Crear modelo
     modelo_manuela = keras.models.Sequential([
         keras.layers.Input(shape=(X_train_manu_scaled.shape[1],)),
+        keras.layers.Dense(128, activation="relu"),
         keras.layers.Dense(64, activation="relu"),
         keras.layers.Dense(32, activation="relu"),
         keras.layers.Dense(1)
@@ -291,7 +293,7 @@ with mlflow.start_run(run_name=nombre_exp):
 
     #Entrenar el modelo
     hist_mmanu = modelo_manuela.fit(X_train_manu_scaled, y_train_manu, 
-                                    epochs=20,
+                                    epochs=50,
                                     validation_data=(X_valid_manu_scaled, y_valid_manu)) 
     
     #Evaluar modelo
@@ -314,14 +316,14 @@ with mlflow.start_run(run_name=nombre_exp):
     plt.plot(hist_mmanu.history["val_loss"], label="Validation loss")
     plt.xlabel("Épocas")
     plt.ylabel("Pérdida")
-    plt.title("Historial de pérdida - Modelo base")
+    plt.title("Historial de pérdida - Modelo grande")
     plt.legend()
     plt.grid(True)
 
     #Guardar gráfico y registrar en MLflow
     plt.tight_layout()
-    plt.savefig("loss_modelo_base_manuela.png")
-    mlflow.log_artifact("loss_modelo_base_manuela.png")
+    plt.savefig("loss_modelo_grande_manuela.png")
+    mlflow.log_artifact("loss_modelo_grande_manuela.png")
     plt.show() 
 
     #Guardar modelo
