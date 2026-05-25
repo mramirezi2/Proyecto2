@@ -4,9 +4,11 @@
 # ======================================================
 
 import dash
-from dash import html, dcc, Input, Output
+from dash import html, dcc, Input, Output, State
 from pathlib import Path
 from tab_pregunta1 import tab_pregunta_1, registrar_callbacks_p1
+import numpy as np
+import tensorflow as tf
 
 # ======================================================
 # Configuración inicial
@@ -18,6 +20,10 @@ app = dash.Dash(
     assets_folder=str(BASE_DIR / "assets"),
     suppress_callback_exceptions=True)
 server = app.server
+PROJECT_DIR = BASE_DIR.parent
+MODEL_BRECHA_PATH = PROJECT_DIR / "modelos" / "modelo_brecha_digital.keras"
+
+modelo_brecha = tf.keras.models.load_model(MODEL_BRECHA_PATH)
 
 # ======================================================
 # Estilos generales
@@ -35,6 +41,17 @@ card_style = {
     "boxShadow": "0px 3px 8px rgba(0,0,0,0.08)",
     "marginBottom": "20px"}
 
+button_style = {
+    "backgroundColor": COLOR_AZUL,
+    "color": "white",
+    "border": "none",
+    "borderRadius": "8px",
+    "padding": "12px 24px",
+    "fontWeight": "bold",
+    "cursor": "pointer",
+    "width": "100%",
+    "marginTop": "10px"
+}
 
 # ======================================================
 # Header con logos
@@ -211,6 +228,13 @@ tab_portada = html.Div(
 # ======================================================
 
 
+# ======================================================
+# Tab 2 - Brecha digital y hogar
+# ======================================================
+
+# ======================================================
+# Tab 2 - Brecha digital y hogar
+# ======================================================
 
 tab_pregunta_2 = html.Div(
     style={
@@ -219,21 +243,240 @@ tab_pregunta_2 = html.Div(
         "backgroundColor": COLOR_GRIS
     },
     children=[
-        html.H2("Riesgo por brecha digital", style={"color": COLOR_AZUL}),
+        html.H2(
+            "Brecha digital y hogar",
+            style={
+                "color": COLOR_AZUL,
+                "marginBottom": "20px"
+            }
+        ),
+
         html.Div(
-            style=card_style,
+            style={
+                "display": "grid",
+                "gridTemplateColumns": "1fr 1.35fr",
+                "gap": "20px",
+                "alignItems": "start"
+            },
             children=[
-                html.H3("Descripción del problema", style={"color": COLOR_AZUL}),
-                html.P(
-                    "En esta sección se integrará el segundo modelo predictivo. "
-                    "La estructura puede incluir descripción, entradas del usuario, "
-                    "predicción del modelo y visualizaciones de apoyo."
+
+                # ======================================================
+                # Columna izquierda: descripción + inputs
+                # ======================================================
+                html.Div(
+                    children=[
+
+                        # 1. Descripción del problema
+                        html.Div(
+                            style=card_style,
+                            children=[
+                                html.H3(
+                                    "1. Descripción del problema",
+                                    style={"color": COLOR_AZUL}
+                                ),
+
+                                html.P(
+                                    "Esta sección analiza si las condiciones de brecha digital y del hogar "
+                                    "permiten clasificar a los estudiantes del Cauca según su probabilidad "
+                                    "de presentar bajo desempeño en las pruebas Saber 11. Para esto, se requiere "
+                                    "conocer si el estudiante tiene acceso a computador e internet, el estrato de "
+                                    "la vivienda y el número de personas en el hogar, con el fin de apoyar la "
+                                    "identificación temprana de perfiles estudiantiles que podrían requerir "
+                                    "mayor acompañamiento académico o tecnológico.",
+                                    style={
+                                        "textAlign": "justify",
+                                        "lineHeight": "1.6",
+                                        "fontSize": "15px"
+                                    }
+                                ),
+
+                                html.Div(
+                                    style={
+                                        "display": "flex",
+                                        "justifyContent": "center",
+                                        "marginTop": "18px"
+                                    },
+                                    children=[
+                                        html.Img(
+                                            src="/assets/brecha.jpg",
+                                            style={
+                                                "width": "100%",
+                                                "maxWidth": "430px",
+                                                "height": "220px",
+                                                "objectFit": "cover",
+                                                "borderRadius": "12px",
+                                                "boxShadow": "0px 4px 10px rgba(0,0,0,0.15)"
+                                            }
+                                        )
+                                    ]
+                                )
+                            ]
+                        ),
+
+                        # 2. Inputs del modelo
+                        html.Div(
+                            style=card_style,
+                            children=[
+                                html.H3(
+                                    "2. Ingrese los datos relacionados con el estudiante",
+                                    style={"color": COLOR_AZUL}
+                                ),
+
+                                html.Label("Acceso a computador en el hogar"),
+                                dcc.Dropdown(
+                                    id="brecha-computador",
+                                    options=[
+                                        {"label": "Sí", "value": 1},
+                                        {"label": "No", "value": 0}
+                                    ],
+                                    value=0,
+                                    clearable=False,
+                                    style={"marginBottom": "15px"}
+                                ),
+
+                                html.Label("Acceso a internet en el hogar"),
+                                dcc.Dropdown(
+                                    id="brecha-internet",
+                                    options=[
+                                        {"label": "Sí", "value": 1},
+                                        {"label": "No", "value": 0}
+                                    ],
+                                    value=0,
+                                    clearable=False,
+                                    style={"marginBottom": "15px"}
+                                ),
+
+                                html.Label("Estrato de la vivienda"),
+                                dcc.Dropdown(
+                                    id="brecha-estrato",
+                                    options=[
+                                        {"label": str(i), "value": i}
+                                        for i in range(1, 7)
+                                    ],
+                                    value=1,
+                                    clearable=False,
+                                    style={"marginBottom": "15px"}
+                                ),
+
+                                html.Label("Número de personas en el hogar"),
+                                dcc.Dropdown(
+                                    id="brecha-personas",
+                                    options=[
+                                        {"label": str(i), "value": i}
+                                        for i in range(1, 11)
+                                    ],
+                                    value=4,
+                                    clearable=False,
+                                    style={"marginBottom": "20px"}
+                                ),
+
+                                html.Button(
+                                    "Ejecutar modelo",
+                                    id="boton-brecha",
+                                    n_clicks=0,
+                                    style=button_style
+                                )
+                            ]
+                        )
+                    ]
+                ),
+
+                # ======================================================
+                # Columna derecha: resultado + conclusión + recordatorio
+                # ======================================================
+                html.Div(
+                    children=[
+
+                        # 3. Resultado del modelo
+                        html.Div(
+                            id="tarjeta-probabilidad-brecha",
+                            style=card_style,
+                            children=[
+                                html.H3(
+                                    "3. Probabilidad de bajo desempeño",
+                                    style={"color": COLOR_AZUL}
+                                ),
+                                html.P(
+                                    "Ingrese los datos del estudiante y presione 'Ejecutar modelo' "
+                                    "para obtener la predicción.",
+                                    style={
+                                        "color": "#555",
+                                        "fontSize": "16px"
+                                    }
+                                )
+                            ]
+                        ),
+
+                        # 4. Conclusión
+                        html.Div(
+                            id="conclusion-brecha",
+                            style=card_style,
+                            children=[
+                                html.H3(
+                                    "4. Conclusión",
+                                    style={"color": COLOR_AZUL}
+                                ),
+                                html.P(
+                                    "La conclusión se generará después de ejecutar el modelo.",
+                                    style={
+                                        "color": "#555",
+                                        "fontSize": "16px"
+                                    }
+                                )
+                            ]
+                        ),
+
+                        # 5. Recordatorio
+                        html.Div(
+                            style={
+                                **card_style,
+                                "display": "flex",
+                                "alignItems": "center",
+                                "gap": "18px",
+                                "backgroundColor": "#EFF6FF",
+                                "border": "1.5px solid #93C5FD"
+                            },
+                            children=[
+                                html.Img(
+                                    src="/assets/campana.png",
+                                    style={
+                                        "width": "58px",
+                                        "height": "58px",
+                                        "objectFit": "contain"
+                                    }
+                                ),
+
+                                html.Div(
+                                    children=[
+                                        html.H3(
+                                            "5. Recordatorio",
+                                            style={
+                                                "color": COLOR_AZUL,
+                                                "marginTop": "0px",
+                                                "marginBottom": "8px"
+                                            }
+                                        ),
+                                        html.P(
+                                            "Este modelo es una herramienta de alerta temprana para priorizar "
+                                            "seguimiento académico y apoyo tecnológico, y no un mecanismo "
+                                            "definitivo de clasificación individual.",
+                                            style={
+                                                "fontSize": "16px",
+                                                "lineHeight": "1.6",
+                                                "margin": "0px",
+                                                "textAlign": "justify"
+                                            }
+                                        )
+                                    ]
+                                )
+                            ]
+                        )
+                    ]
                 )
             ]
         )
     ]
 )
-
 
 tab_pregunta_3 = html.Div(
     style={
@@ -312,6 +555,156 @@ def renderizar_tabs(tab):
 # ======================================================
 # Ejecución local
 # ======================================================
+# ======================================================
+# Callback - Modelo brecha digital
+# ======================================================
+
+@app.callback(
+    Output("tarjeta-probabilidad-brecha", "children"),
+    Output("tarjeta-probabilidad-brecha", "style"),
+    Output("conclusion-brecha", "children"),
+    Input("boton-brecha", "n_clicks"),
+    State("brecha-computador", "value"),
+    State("brecha-internet", "value"),
+    State("brecha-estrato", "value"),
+    State("brecha-personas", "value")
+)
+def predecir_brecha_digital(n_clicks, computador, internet, estrato, personas):
+
+    estilo_base = card_style.copy()
+
+    if n_clicks == 0:
+        return (
+            [
+                html.H3(
+                    "3. Probabilidad de bajo desempeño",
+                    style={"color": COLOR_AZUL}
+                ),
+                html.P(
+                    "Ingrese los datos del estudiante y presione 'Ejecutar modelo' "
+                    "para obtener la predicción.",
+                    style={"color": "#555", "fontSize": "16px"}
+                )
+            ],
+            estilo_base,
+            [
+                html.H3("4. Conclusión", style={"color": COLOR_AZUL}),
+                html.P(
+                    "La conclusión se generará después de ejecutar el modelo.",
+                    style={"color": "#555", "fontSize": "16px"}
+                )
+            ]
+        )
+
+    entrada = np.array(
+        [[computador, internet, estrato, personas]],
+        dtype="float32"
+    )
+
+    probabilidad = float(modelo_brecha.predict(entrada, verbose=0)[0][0])
+    porcentaje = probabilidad * 100
+
+    if probabilidad < 0.30:
+        riesgo = "Bajo"
+        color_fondo = "#DCFCE7"   # verde claro
+        color_texto = "#166534"
+        conclusion = (
+            "El perfil ingresado presenta un riesgo bajo de bajo desempeño. "
+            "Aunque no se identifica una alerta prioritaria, se recomienda mantener "
+            "seguimiento general al estudiante."
+        )
+
+    elif probabilidad < 0.550:
+        riesgo = "Medio"
+        color_fondo = "#FEF9C3"   # amarillo claro
+        color_texto = "#854D0E"
+        conclusion = (
+            "El perfil ingresado presenta un riesgo medio de bajo desempeño. "
+            "Esto sugiere la conveniencia de realizar seguimiento preventivo y revisar "
+            "posibles necesidades de acompañamiento académico o tecnológico."
+        )
+
+    else:
+        riesgo = "Alto"
+        color_fondo = "#FEE2E2"   # rojo claro
+        color_texto = "#991B1B"
+        conclusion = (
+            "El perfil ingresado presenta un riesgo alto de bajo desempeño. "
+            "Este resultado puede servir como alerta temprana para priorizar estrategias "
+            "de acompañamiento académico y apoyo en acceso a recursos tecnológicos."
+        )
+
+    estilo_resultado = card_style.copy()
+    estilo_resultado["backgroundColor"] = color_fondo
+    estilo_resultado["border"] = f"2px solid {color_texto}"
+
+    contenido_resultado = [
+        html.H3(
+            "3. Probabilidad de bajo desempeño",
+            style={"color": color_texto}
+        ),
+
+        html.Div(
+            style={
+                "textAlign": "center",
+                "padding": "20px"
+            },
+            children=[
+                html.H1(
+                    f"{porcentaje:.1f}%",
+                    style={
+                        "fontSize": "64px",
+                        "color": color_texto,
+                        "margin": "10px 0px"
+                    }
+                ),
+
+                html.H3(
+                    f"Riesgo {riesgo}",
+                    style={
+                        "color": color_texto,
+                        "textTransform": "uppercase",
+                        "marginBottom": "20px"
+                    }
+                ),
+
+                html.P(
+                    f"El estudiante tiene un porcentaje del {porcentaje:.1f}% "
+                    "de tener un bajo desempeño según su acceso a computador e internet, "
+                    "su estrato y las personas con las que vive.",
+                    style={
+                        "fontSize": "17px",
+                        "lineHeight": "1.6",
+                        "textAlign": "justify"
+                    }
+                ),
+
+                html.P(
+                    f"Esto se puede interpretar como un riesgo {riesgo}.",
+                    style={
+                        "fontSize": "18px",
+                        "fontWeight": "bold",
+                        "color": color_texto,
+                        "marginTop": "18px"
+                    }
+                )
+            ]
+        )
+    ]
+
+    contenido_conclusion = [
+        html.H3("4. Conclusión", style={"color": COLOR_AZUL}),
+        html.P(
+            conclusion,
+            style={
+                "fontSize": "16px",
+                "lineHeight": "1.6",
+                "textAlign": "justify"
+            }
+        )
+    ]
+
+    return contenido_resultado, estilo_resultado, contenido_conclusion
 
 if __name__ == "__main__":
     app.run(debug=True)
