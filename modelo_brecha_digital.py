@@ -8,6 +8,7 @@
 
 import pandas as pd
 import numpy as np
+import mlflow
 
 # Importar el archivo de limpieza que ya existe en el proyecto
 import Proyecto2
@@ -111,6 +112,10 @@ from tensorflow.keras.callbacks import EarlyStopping
 np.random.seed(42)
 tf.random.set_seed(42)
 
+# Configuración de MLflow
+mlflow.set_tracking_uri("file:./mlruns")
+mlflow.set_experiment("brecha_digital_saber11")
+
 # Primera división: entrenamiento + validación / prueba
 X_train_val, X_test, y_train_val, y_test = train_test_split(X,y,
     test_size=0.20,
@@ -194,17 +199,17 @@ def construir_modelo(nombre_modelo, capas, dropout=0.0, learning_rate=0.001):
 arquitecturas = {
     "Modelo_1_simple": {
         "capas": [8],
-        "dropout": 0.0,
+        "dropout": 0.1,
         "learning_rate": 0.001
     },
     "Modelo_2_intermedio": {
         "capas": [16, 8],
-        "dropout": 0.0,
+        "dropout": 0.1,
         "learning_rate": 0.001
     },
     "Modelo_3_profundo": {
         "capas": [32, 16, 8],
-        "dropout": 0.0,
+        "dropout": 0.1,
         "learning_rate": 0.001
     }}
 
@@ -214,8 +219,11 @@ arquitecturas = {
 
 resultados = []
 modelos_entrenados = {}
-
 historiales_entrenamiento = {}
+run_ids = {}
+
+EPOCHS = 50
+BATCH_SIZE = 32
 
 for nombre, config in arquitecturas.items():
 
@@ -223,26 +231,24 @@ for nombre, config in arquitecturas.items():
     print(f"Entrenando: {nombre}")
     print("="*60)
 
+    # Construir modelo
     modelo = construir_modelo(
         nombre_modelo=nombre,
         capas=config["capas"],
         dropout=config["dropout"],
         learning_rate=config["learning_rate"])
 
-    early_stopping = EarlyStopping(
-        monitor="val_loss",
-        patience=10,
-        restore_best_weights=True)
-
+    # Entrenar modelo
     historial = modelo.fit(
         X_train_np,
         y_train_np,
         validation_data=(X_val_np, y_val_np),
-        epochs=100,
-        batch_size=32,
-        callbacks=[early_stopping],
+        epochs=EPOCHS,
+        batch_size=BATCH_SIZE,
         class_weight=class_weight,
         verbose=0)
+
+    # Guardar historial para graficar curvas de aprendizaje
     historiales_entrenamiento[nombre] = historial
 
     # Predicciones en validación
@@ -253,18 +259,40 @@ for nombre, config in arquitecturas.items():
     y_test_prob = modelo.predict(X_test_np, verbose=0)
     y_test_pred = (y_test_prob >= 0.5).astype(int).ravel()
 
-    # Métricas de validación
+    # Métricas
     val_acc = accuracy_score(y_val_np, y_val_pred)
     val_f1 = f1_score(y_val_np, y_val_pred, zero_division=0)
 
-    # Métricas de prueba
     test_acc = accuracy_score(y_test_np, y_test_pred)
     test_f1 = f1_score(y_test_np, y_test_pred, zero_division=0)
 
-    # Épocas
-    epocas_entrenadas = len(historial.history["loss"])
-    mejor_epoca_val_loss = int(np.argmin(historial.history["val_loss"]) + 1)
+        # ======================================================
+    # Registro del experimento en MLflow
+    # ======================================================
 
+    with mlflow.start_run(run_name=nombre) as run:
+
+        mlflow.log_param("modelo", nombre)
+        mlflow.log_param("arquitectura", str(config["capas"]))
+        mlflow.log_param("dropout", config["dropout"])
+        mlflow.log_param("learning_rate", config["learning_rate"])
+        mlflow.log_param("epochs", EPOCHS)
+        mlflow.log_param("batch_size", BATCH_SIZE)
+        mlflow.log_param("variables_x", ", ".join(variables_x))
+        mlflow.log_param("umbral_bajo_desempeno", float(umbral_bajo))
+        mlflow.log_param("capa_normalizacion", "Normalization")
+
+        mlflow.log_metric("val_acc", val_acc)
+        mlflow.log_metric("val_f1", val_f1)
+        mlflow.log_metric("test_acc", test_acc)
+        mlflow.log_metric("test_f1", test_f1)
+
+        mlflow.log_metric("loss_final", historial.history["loss"][-1])
+        mlflow.log_metric("val_loss_final", historial.history["val_loss"][-1])
+
+        run_ids[nombre] = run.info.run_id
+
+    # Guardar resultados
     resultados.append({
         "Modelo": nombre,
         "Arquitectura": str(config["capas"]),
@@ -273,10 +301,9 @@ for nombre, config in arquitecturas.items():
         "Val F1": round(val_f1, 4),
         "Test Acc": round(test_acc, 4),
         "Test F1": round(test_f1, 4),
-        "Épocas entrenadas": epocas_entrenadas,
-        "Mejor época según Val Loss": mejor_epoca_val_loss
-    })
+        "Épocas": EPOCHS})
 
+    # Guardar modelo entrenado
     modelos_entrenados[nombre] = modelo
 
 # ======================================================
@@ -435,3 +462,20 @@ plt.title(f"{mejor_modelo_nombre} - Matriz de confusión en prueba")
 plt.tight_layout()
 plt.savefig("resultados/graficas/matriz_confusion_brecha_digital.png", dpi=300)
 plt.show()
+
+# ======================================================
+# 19. Guardar artefactos del mejor modelo en MLflow
+# ======================================================
+
+with mlflow.start_run(run_id=run_ids[mejor_modelo_nombre]):
+
+    mlflow.log_artifact(ruta_resultados)
+    mlflow.log_artifact(ruta_variables)
+    mlflow.log_artifact(ruta_modelo)
+
+    mlflow.log_artifacts(
+        "resultados/graficas",
+        artifact_path="graficas"
+    )
+
+print("\nArtefactos del mejor modelo registrados en MLflow.")
