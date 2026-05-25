@@ -87,6 +87,7 @@ print("Duplicados:", df_original.duplicated().sum())
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.utils.class_weight import compute_class_weight
+import mlflow
 
 # VARIABLE OBJETIVO
 print("\nDistribución de clases (variable objetivo):")
@@ -298,7 +299,9 @@ early_stop = tf.keras.callbacks.EarlyStopping(
 )
  
 # ENTRENAMIENTO
+
 resultados = {}
+mlflow.set_experiment("Saber11_Cauca_Brecha_Territorial")
  
 for nombre, build_fn in modelos_config.items():
     print(f"  Entrenando: {nombre}")
@@ -306,29 +309,44 @@ for nombre, build_fn in modelos_config.items():
     model = build_fn()
     model.summary()
  
-    history = model.fit(
-        X_train, y_train_cat,
-        epochs=EPOCHS,
-        batch_size=BATCH_SIZE,
-        validation_data=(X_val, y_val_cat),
-        class_weight=class_weight_dict,
-        callbacks=[early_stop],
-        verbose=1
-    )
- 
-    epocas_reales = len(history.history["loss"])
- 
-    y_val_pred  = np.argmax(model.predict(X_val,  verbose=0), axis=1)
-    y_test_pred = np.argmax(model.predict(X_test, verbose=0), axis=1)
- 
-    val_acc  = accuracy_score(y_val,  y_val_pred)
-    val_f1   = f1_score(y_val,  y_val_pred, average="macro")
-    test_acc = accuracy_score(y_test, y_test_pred)
-    test_f1  = f1_score(y_test, y_test_pred, average="macro")
- 
-    print(f"\n  Accuracy: {val_acc:.4f} | F1-macro: {val_f1:.4f}")
-    print(f"  Accuracy: {test_acc:.4f} | F1-macro: {test_f1:.4f}")
-    print(f"\n{classification_report(y_test, y_test_pred, target_names=label_names, digits=4)}")
+    with mlflow.start_run(run_name=nombre):
+        mlflow.log_param("modelo", nombre)
+        mlflow.log_param("epochs_max", EPOCHS)
+        mlflow.log_param("batch_size", BATCH_SIZE)
+        mlflow.log_param("total_params", model.count_params())
+
+        history = model.fit(
+            X_train, y_train_cat,
+            epochs=EPOCHS,
+            batch_size=BATCH_SIZE,
+            validation_data=(X_val, y_val_cat),
+            class_weight=class_weight_dict,
+            callbacks=[early_stop],
+            verbose=1
+        )
+
+        epocas_reales = len(history.history["loss"])
+    
+        y_val_pred  = np.argmax(model.predict(X_val,  verbose=0), axis=1)
+        y_test_pred = np.argmax(model.predict(X_test, verbose=0), axis=1)
+    
+        val_acc  = accuracy_score(y_val,  y_val_pred)
+        val_f1   = f1_score(y_val,  y_val_pred, average="macro")
+        test_acc = accuracy_score(y_test, y_test_pred)
+        test_f1  = f1_score(y_test, y_test_pred, average="macro")
+
+        mlflow.log_metric("val_accuracy",  val_acc)
+        mlflow.log_metric("val_f1_macro",  val_f1)
+        mlflow.log_metric("test_accuracy", test_acc)
+        mlflow.log_metric("test_f1_macro", test_f1)
+        mlflow.log_metric("epocas_reales", epocas_reales)
+        mlflow.log_artifact(f"curva_{nombre}.png")
+        mlflow.log_artifact(f"confusion_{nombre}.png")
+    
+
+        print(f"\n  Accuracy: {val_acc:.4f} | F1-macro: {val_f1:.4f}")
+        print(f"  Accuracy: {test_acc:.4f} | F1-macro: {test_f1:.4f}")
+        print(f"\n{classification_report(y_test, y_test_pred, target_names=label_names, digits=4)}")
  
     # Curva de aprendizaje
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
