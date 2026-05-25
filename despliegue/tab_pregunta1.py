@@ -149,20 +149,47 @@ tab_pregunta_1 = html.Div(
     style={"fontFamily": "Arial", "padding": "30px", "backgroundColor": COLOR_GRIS},
     children=[
  
-        # Encabezado
         html.Div(style=card_style, children=[
-            html.H2("Pregunta 3: Brechas Territoriales",
-                    style={"color": COLOR_AZUL, "marginBottom": "6px"}),
-            html.P(
-                "¿Las condiciones institucionales del colegio permiten predecir el nivel "
-                "de desempeño de un estudiante en las pruebas Saber 11?",
-                style={"color": "#444", "fontSize": "15px", "marginBottom": "4px"}
-            ),
-            html.P(
-                "Ingrese las características del colegio para obtener la clasificación "
-                "esperada del estudiante: Bajo, Medio, Alto o Muy Alto.",
-                style={"color": "#666", "fontSize": "13px"}
-            ),
+            html.Div(
+                style={"display": "flex", "gap": "30px", "alignItems": "flex-start"},
+                children=[
+                    # Columna izquierda - texto
+                    html.Div(style={"flex": "2"}, children=[
+                        html.H3("¿Qué analiza esta sección?", style={"color": COLOR_AZUL, "marginTop": "0"}),
+                        html.P(
+                            "Las condiciones institucionales del establecimiento educativo son uno de los factores asociados al desempeño académico de los estudiantes. Esta herramienta permite explorar cómo características como la zona de ubicación, la jornada, la naturaleza y el carácter del colegio se relacionan con el nivel de desempeño esperado en las pruebas Saber 11 del departamento del Cauca, reconociendo que estas variables explican una parte del fenómeno y que factores adicionales del hogar y el contexto socioeconómico también inciden en los resultados.",
+                            style={"textAlign": "justify", "lineHeight": "1.8",
+                                "fontSize": "14px", "color": "#444"}
+                        ),
+                        html.P(
+                            "Seleccione las condiciones del colegio y obtenga la clasificación "
+                            "esperada: Bajo, Medio, Alto o Muy Alto.",
+                            style={"fontSize": "13px", "color": "#666", "fontStyle": "italic"}
+                        ),
+                    ]),
+                    # Columna derecha - dato destacado
+                    html.Div(
+                        style={
+                            "flex": "1",
+                            "backgroundColor": "#EFF6FF",
+                            "borderRadius": "10px",
+                            "padding": "20px",
+                            "textAlign": "center",
+                            "border": "1px solid #BFDBFE"
+                        },
+                        children=[
+                            html.P("Estudiantes analizados", style={"color": "#666", "fontSize": "12px", "margin": "0"}),
+                            html.H2("3.871", style={"color": COLOR_AZUL, "margin": "6px 0"}),
+                            html.P("en el departamento del Cauca", style={"color": "#666", "fontSize": "12px", "margin": "0 0 16px 0"}),
+                            html.Hr(style={"borderColor": "#BFDBFE"}),
+                            html.P("Variables institucionales", style={"color": "#666", "fontSize": "12px", "margin": "8px 0 0 0"}),
+                            html.H3("7", style={"color": COLOR_AZUL, "margin": "4px 0"}),
+                            html.P("zona · jornada · naturaleza · calendario · carácter · bilingüe · género",
+                                style={"color": "#888", "fontSize": "11px", "margin": "0"}),
+                        ]
+                    )
+                ]
+            )
         ]),
  
         # Formulario + Resultado
@@ -235,7 +262,7 @@ tab_pregunta_1 = html.Div(
             html.Div(
                 style={"display": "grid", "gridTemplateColumns": "repeat(4, 1fr)", "gap": "16px"},
                 children=[
-                    _metric_card("Modelo", "ModeloB — Dropout"),
+                    _metric_card("Modelo", "ModeloB - Dropout"),
                     _metric_card("F1-macro (test)", "0.355"),
                     _metric_card("Accuracy (test)", "0.350"),
                     _metric_card("Épocas entrenadas", "37 / 150"),
