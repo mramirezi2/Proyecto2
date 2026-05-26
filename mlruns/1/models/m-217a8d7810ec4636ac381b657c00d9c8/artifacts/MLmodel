@@ -1,0 +1,20 @@
+artifact_path: "/Users/manuelaramirez/Desktop/Anali\u0301tica/Proyecto 2/Proyecto2/mlruns/1/models/m-217a8d7810ec4636ac381b657c00d9c8/artifacts"
+flavors:
+  keras:
+    data: data
+    keras_backend: tensorflow
+    keras_version: 3.14.1
+    save_exported_model: false
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.keras
+    python_version: 3.12.10
+mlflow_version: 3.12.0
+model_id: m-217a8d7810ec4636ac381b657c00d9c8
+model_size_bytes: 180924
+model_uuid: m-217a8d7810ec4636ac381b657c00d9c8
+prompts: null
+run_id: 4e83157421ac4d3883218ec9d010de7e
+utc_time_created: '2026-05-26 01:19:12.023972'
