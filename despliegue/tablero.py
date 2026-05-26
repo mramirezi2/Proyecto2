@@ -21,7 +21,7 @@ app = dash.Dash(
     assets_folder=str(BASE_DIR / "assets"),
     suppress_callback_exceptions=True)
 server = app.server
-PROJECT_DIR = BASE_DIR.parent
+PROJECT_DIR = BASE_DIR
 MODEL_BRECHA_PATH = PROJECT_DIR / "modelos" / "modelo_brecha_digital.keras"
 
 modelo_brecha = tf.keras.models.load_model(MODEL_BRECHA_PATH)
