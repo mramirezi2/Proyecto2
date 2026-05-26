@@ -346,7 +346,7 @@ def registrar_callbacks_manuela(app):
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=percentil,
-            number={"suffix": "°", "font": {"size": 36, "color": color}},
+            number={"suffix": "%", "font": {"size": 36, "color": color}},
             gauge={
                 "axis": {"range": [0, 100]},
                 "bar": {"color": color},
