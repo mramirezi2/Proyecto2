@@ -669,7 +669,7 @@ variables_modelo_manu.to_csv(ruta_variables_manu,index=False)
 
 #Scaler
 import joblib
-joblib.dump(scaler_manu,"modelo_manuela/scaler_manuela.pkl")
+joblib.dump(scaler_manu,"modelos/scaler_manuela.pkl")
 print("Scaler guardado correctamente")
 
 print("\nVariables del modelo guardadas en:",ruta_variables_manu)
